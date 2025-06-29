@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#4CAF50</color>
+    <color name="secondaryColor">#388E3C</color>
+    <color name="background">#302e2b</color>
+    <color name="sec_background">#424242</color>
+    <color name="field_background">#757575</color>
+    <color name="buttonColor">#4CAF50</color>
+    <color name="puzzleColor">#E09834</color>
+
+</resources>

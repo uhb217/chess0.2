@@ -26,11 +26,21 @@
         android:textColor="#FFFFFF"
         android:gravity="center" />
 
+    <TextView
+        android:id="@+id/roomIdText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Room id: ??????"
+        android:inputType="text"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+
     <Button
         android:id="@+id/cancelButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="15dp"
         android:backgroundTint="@color/secondaryColor"
         android:text="Cancel" />
 </LinearLayout>

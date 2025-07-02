@@ -11,6 +11,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
@@ -18,32 +20,40 @@ import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.Color;
 
 public class MainActivity extends AppCompatActivity {
-    private Board board;
-    LinearLayout rootLayout;
-    PlayerInfoView topPlayerInfoView, bottomPlayerInfoView;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-        rootLayout = findViewById(R.id.main);
-        board = new Board(this,Color.WHITE);
-        topPlayerInfoView = new PlayerInfoView(this, Player.empty());
-        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
-            if (player != null)
-                bottomPlayerInfoView = new PlayerInfoView(this, player);
-            else {
-                bottomPlayerInfoView = new PlayerInfoView(this, Player.empty());
-                Log.e("Player", "Failed to fetch player data");
-            }
-        });
-        rootLayout.addView(topPlayerInfoView);
-        rootLayout.addView(board);
-    }
+  private Board board;
+  LinearLayout rootLayout;
+  PlayerInfoView topPlayerInfoView, bottomPlayerInfoView;
+  Player mainPlayer, opponentPlayer;
 
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    EdgeToEdge.enable(this);
+    setContentView(R.layout.activity_main);
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+      return insets;
+    });
+
+    mainPlayer = (Player) getIntent().getSerializableExtra("mainPlayer");
+    opponentPlayer = (Player) getIntent().getSerializableExtra("opponentPlayer");
+
+    rootLayout = findViewById(R.id.main);
+    board = new Board(this, mainPlayer.getColor());
+    topPlayerInfoView = new PlayerInfoView(this, opponentPlayer);
+    bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer);
+
+    rootLayout.addView(topPlayerInfoView);
+    rootLayout.addView(board);
+    rootLayout.addView(bottomPlayerInfoView);
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    String roomId = getIntent().getStringExtra("roomId");
+    if (roomId != null)
+      FirebaseDatabase.getInstance().getReference("rooms").child(roomId).removeValue();
+  }
 }

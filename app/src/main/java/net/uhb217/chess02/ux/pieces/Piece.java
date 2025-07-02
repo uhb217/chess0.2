@@ -8,11 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import net.uhb217.chess02.ux.Board;
-import net.uhb217.chess02.ux.Color;
-import net.uhb217.chess02.ux.Point;
-import net.uhb217.chess02.ux.Pos;
+import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.Point;
+import net.uhb217.chess02.ux.utils.Pos;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

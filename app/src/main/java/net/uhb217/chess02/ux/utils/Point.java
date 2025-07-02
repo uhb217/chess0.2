@@ -1,4 +1,4 @@
-package net.uhb217.chess02.ux;
+package net.uhb217.chess02.ux.utils;
 
 import android.content.Context;
 import android.view.View;

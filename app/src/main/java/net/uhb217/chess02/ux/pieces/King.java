@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 
 import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.Board;
-import net.uhb217.chess02.ux.Color;
-import net.uhb217.chess02.ux.Pos;
+import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.Pos;
 
 import java.util.ArrayList;
 import java.util.List;

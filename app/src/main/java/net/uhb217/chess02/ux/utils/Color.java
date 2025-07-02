@@ -1,4 +1,4 @@
-package net.uhb217.chess02.ux;
+package net.uhb217.chess02.ux.utils;
 
 public enum Color {
     WHITE(1),

@@ -1,4 +1,4 @@
-package net.uhb217.chess02.ux;
+package net.uhb217.chess02.ux.utils;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 import net.uhb217.chess02.R;
 
 public class Dialogs {
-    public static void showPromotionDialog(Context ctx,Color color, PromotionCallback callback) {
+    public static void showPromotionDialog(Context ctx, Color color, PromotionCallback callback) {
         Dialog dialog = new Dialog(ctx);
         dialog.setContentView(R.layout.dialog_promotion);
         dialog.setCancelable(false);
@@ -121,13 +121,17 @@ public class Dialogs {
             }
         });
     }
-
-    public static void dismissWaitingDialog() {
-        if (waitingDialog != null && waitingDialog.isShowing()) {
-            waitingDialog.dismiss();
-            waitingDialog = null;
-        }
+    public static Dialog loginWaitingDialog(Context ctx) {
+        Dialog dialog = new Dialog(ctx);
+        View dialogView = LayoutInflater.from(ctx).inflate(R.layout.login_waiting_dialog, null);
+        dialog.setContentView(dialogView);
+        dialog.setCancelable(false);
+        return dialog;
     }
-
-
+    public static Dialog signupWaitingDialog(Context ctx) {
+        Dialog dialog = loginWaitingDialog(ctx);
+        TextView statusText = dialog.findViewById(R.id.statusText);
+        statusText.setText("Creating account...");
+        return dialog;
+    }
 }

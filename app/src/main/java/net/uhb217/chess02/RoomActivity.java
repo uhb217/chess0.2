@@ -1,6 +1,7 @@
 package net.uhb217.chess02;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -21,10 +22,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import net.uhb217.chess02.ux.Dialogs;
+import net.uhb217.chess02.ui.PlayerInfoView;
+import net.uhb217.chess02.ux.Player;
+import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.Dialogs;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class RoomActivity extends AppCompatActivity {
@@ -45,6 +47,14 @@ public class RoomActivity extends AppCompatActivity {
         createRoomButton = findViewById(R.id.create_room_button);
         joinButton = findViewById(R.id.join_button);
         roomIdInput = findViewById(R.id.room_code_edit);
+
+        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
+            if (player != null)
+                PlayerInfoView.overrideXMLPlayerInfoView(findViewById(R.id.bottomPlayerInfo), player);
+            else
+                Log.e("Player", "Failed to fetch player data");
+        });
+
         createRoomButton.setOnClickListener(view -> createUniqueRoom(this));
         joinButton.setOnClickListener(v -> {
             String roomId = roomIdInput.getText().toString().trim().toUpperCase();
@@ -64,6 +74,7 @@ public class RoomActivity extends AppCompatActivity {
                         return;
                     }
                     String player2 = snapshot.child("player2").getValue(String.class);
+                    int white = snapshot.child("white").getValue(Integer.class);
                     if (player2 != null) {
                         roomIdInput.setError("Room is already full");
                         return;
@@ -72,6 +83,8 @@ public class RoomActivity extends AppCompatActivity {
                             .addOnSuccessListener(unused -> {
                                 Toast.makeText(RoomActivity.this, "Joined room: " + roomId, Toast.LENGTH_SHORT).show();
                                 // TODO: Start game activity here
+                                Intent intent = new Intent(RoomActivity.this, MainActivity.class);
+                                intent.putExtra("color", white);
 
                             })
                             .addOnFailureListener(e -> {

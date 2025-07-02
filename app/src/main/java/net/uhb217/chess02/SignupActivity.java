@@ -1,11 +1,14 @@
 package net.uhb217.chess02;
 
+import android.app.Dialog;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +20,12 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.FirebaseDatabase;
+
+import net.uhb217.chess02.ux.utils.Dialogs;
+
+import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity {
     EditText username, password;
@@ -45,13 +54,29 @@ public class SignupActivity extends AppCompatActivity {
                 username.setError("Username cannot be empty");
                 password.setError("Password cannot be empty");
             } else {
+                Dialog waitingDialog = Dialogs.signupWaitingDialog(this);
+                waitingDialog.show();
                 String fakeEmail = user.toLowerCase() + "@chess.app.com";
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(fakeEmail, pass)
                         .addOnSuccessListener(authResult -> {
-                            startActivity(new Intent(this, LoginActivity.class));
-                            Toast.makeText(this,"Signup successful", Toast.LENGTH_SHORT).show();
+                            authResult.getUser().updateProfile(new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(user).build());
+                            Map<String, Object> map = Map.of(
+                                    "uid", authResult.getUser().getUid(),
+                                    "rating", 1200,
+                                    "wins", 0,
+                                    "losses", 0,
+                                    "draws", 0
+                            );
+                            FirebaseDatabase.getInstance().getReference("users").child(user).setValue(map)
+                                    .addOnSuccessListener(aVoid -> {
+                                        waitingDialog.dismiss();
+                                        startActivity(new Intent(this, LoginActivity.class));
+                                        Toast.makeText(this,"Signup successful", Toast.LENGTH_SHORT).show();})
+                                    .addOnFailureListener(e -> Log.e("SignupActivity", "Failed to save user data", e));
                         })
                         .addOnFailureListener(e -> {
+                            waitingDialog.dismiss();
                             if (e instanceof FirebaseAuthUserCollisionException)
                                 username.setError("Username already exists");
                             else
@@ -60,5 +85,6 @@ public class SignupActivity extends AppCompatActivity {
             }
         });
         loginText.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
+
     }
 }

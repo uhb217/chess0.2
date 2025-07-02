@@ -1,8 +1,9 @@
 package net.uhb217.chess02.ux;
 
-import static net.uhb217.chess02.ux.Color.WHITE;
+import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
 import android.content.Context;
+import android.view.Gravity;
 import android.widget.FrameLayout;
 
 import net.uhb217.chess02.R;
@@ -13,6 +14,9 @@ import net.uhb217.chess02.ux.pieces.Pawn;
 import net.uhb217.chess02.ux.pieces.Piece;
 import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
+import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ux.utils.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +32,11 @@ public class Board extends FrameLayout {
     public Board(Context ctx, Color color) {
         super(ctx);
         this.color = color;
-        int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels;
-        setLayoutParams(new LayoutParams(screenWidth, screenWidth));
+        int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
+        LayoutParams params = new LayoutParams(screenWidth, screenWidth);
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        setLayoutParams(params);
+
         setBackground(ctx.getDrawable(R.drawable.chessboard));
         instance = this;
         initializeBoard();

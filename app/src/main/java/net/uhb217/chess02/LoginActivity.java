@@ -1,7 +1,10 @@
 package net.uhb217.chess02;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,6 +16,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import net.uhb217.chess02.ux.utils.Dialogs;
 
 public class LoginActivity extends AppCompatActivity {
     EditText username, password;
@@ -41,23 +46,26 @@ public class LoginActivity extends AppCompatActivity {
             String user = username.getText().toString();
             String pass = password.getText().toString();
             if (user.isEmpty() || pass.isEmpty()) {
-                // Show error message
                 username.setError("Username cannot be empty");
                 password.setError("Password cannot be empty");
             } else {
+                Dialog waitingDialog = Dialogs.loginWaitingDialog(this);
+                waitingDialog.show();
                 String fakeEmail = user.toLowerCase() + "@chess.app.com";
                 FirebaseAuth.getInstance().signInWithEmailAndPassword(fakeEmail,pass)
                         .addOnSuccessListener(authResult -> {
+                            waitingDialog.dismiss();
                             Intent intent = new Intent(this, RoomActivity.class);
                             intent.putExtra("username", user);
                             startActivity(intent);
                         })
                         .addOnFailureListener(e -> {
+                            waitingDialog.dismiss();
                             username.setError("Invalid username or password");
                             password.setError("Invalid username or password");
                         });
             }
         });
-
+        signupText.setOnClickListener(v -> startActivity(new Intent(this, SignupActivity.class)));
     }
 }

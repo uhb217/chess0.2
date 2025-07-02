@@ -11,6 +11,7 @@
 
     <!-- Top player info -->
     <LinearLayout
+        android:id="@+id/topPlayerInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -74,6 +75,7 @@
 
     <!-- Bottom player info (moved between board and text edit) -->
     <LinearLayout
+        android:id="@+id/bottomPlayerInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

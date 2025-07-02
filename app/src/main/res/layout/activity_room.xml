@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".RoomActivity"
+    android:background="@color/background">
 
     <!-- Top player info -->
     <LinearLayout
@@ -60,17 +60,19 @@
             android:padding="8dp"/>
     </LinearLayout>
 
-    <!-- Board placeholder -->
-    <FrameLayout
-        android:id="@+id/board_container"
+    <ImageView
+        android:id="@+id/board"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:src="@drawable/filled_board"
+        android:scaleType="fitCenter"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:gravity="center" />
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"/>
 
-    <!-- Bottom player info -->
+    <!-- Bottom player info (moved between board and text edit) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -120,4 +122,42 @@
             android:padding="8dp"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+        <EditText
+            android:id="@+id/room_code_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Enter room code"
+            android:textColorHint="#FFFFFF"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/edit_text_bg"
+            android:padding="10dp"
+            android:layout_marginEnd="8dp"
+            android:maxLength="6"/>
+        <Button
+            android:id="@+id/join_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Join"
+            android:backgroundTint="@color/primaryColor"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/create_room_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/primaryColor"
+        android:text="create room"
+        android:textSize="20sp"
+        android:layout_margin="16dp"/>
 </LinearLayout>

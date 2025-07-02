@@ -1,6 +1,5 @@
 package net.uhb217.chess02.ux;
 
-import static net.uhb217.chess02.ux.Color.BLACK;
 import static net.uhb217.chess02.ux.Color.WHITE;
 
 import android.content.Context;
@@ -15,11 +14,17 @@ import net.uhb217.chess02.ux.pieces.Piece;
 import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board extends FrameLayout {
     private static Board instance;
     private Piece[][] board = new Piece[8][8];
     private Piece clickedPiece = null;
+    public Pos enPassant = null; // For en passant capture
     private Color color;
+    private Color turnColor = WHITE; // Default turn color
+
     public Board(Context ctx, Color color) {
         super(ctx);
         this.color = color;
@@ -29,6 +34,7 @@ public class Board extends FrameLayout {
         instance = this;
         initializeBoard();
     }
+
     private void initializeBoard() {
         board = new Piece[8][8];
         // Place pawns
@@ -53,7 +59,7 @@ public class Board extends FrameLayout {
         board[2][row] = new Bishop(getContext(), new Pos(2, row), color);
 
         // Keep queen on her own color (D file), king on E
-        if (color == WHITE) {
+        if (this.color == WHITE) {
             board[3][row] = new Queen(getContext(), new Pos(3, row), color);
             board[4][row] = new King(getContext(), new Pos(4, row), color);
         } else {
@@ -65,28 +71,93 @@ public class Board extends FrameLayout {
         board[6][row] = new Knight(getContext(), new Pos(6, row), color);
         board[7][row] = new Rook(getContext(), new Pos(7, row), color);
     }
-    public void movePieceInTheArray(int x1, int y1, int x2, int y2){
+
+    public void movePieceInTheArray(int x1, int y1, int x2, int y2) {
         board[x2][y2] = board[x1][y1];
         board[x1][y1] = null;
     }
+
+    public void putPiece(Piece piece, int x, int y) {
+        board[x][y] = piece;
+    }
+
     public static Board getInstance() {
         return instance;
     }
-    public Piece getPiece(Pos pos){
+
+    public Piece getPiece(Pos pos) {
         return board[pos.x][pos.y];
     }
-    public Piece getPiece(int x, int y){
+
+    public Piece getPiece(int x, int y) {
         return board[x][y];
+    }
+
+    public King getKing(Color color) {
+        for (Piece[] row : board)
+            for (Piece piece : row)
+                if (piece instanceof King && piece.getColor() == color)
+                    return (King) piece;
+        return null; // Should never happen if the board is initialized correctly
+    }
+
+    public List<Piece> getPieces(Color color) {
+        List<Piece> pieces = new ArrayList<>();
+        for (Piece[] row : board)
+            for (Piece piece : row)
+                if (piece != null && piece.getColor() == color)
+                    pieces.add(piece);
+        return pieces;
+    }
+
+    private boolean isStaleMate() {
+        for (Piece piece : getPieces(turnColor))
+            if (!piece.getLegalMoves().isEmpty())
+                return false; // If any piece has legal moves, return true
+        return true; // No pieces with legal moves
     }
 
     public Color getColor() {
         return this.color;
     }
+
+    public Piece[][] getBoard() {
+        return board;
+    }
+
+    public Piece[][] getBoardCopy() {
+        Piece[][] copy = new Piece[8][8];
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
+                if (board[i][j] != null)
+                    copy[i][j] = board[i][j];
+        return copy;
+    }
+
     public Piece getClickedPiece() {
         return clickedPiece;
     }
 
     public void setClickedPiece(Piece clickedPiece) {
         this.clickedPiece = clickedPiece;
+    }
+
+    public void nextTurn() {
+        turnColor = turnColor.opposite();
+        //check if the game is over
+        String gameOver = null;
+        King enemyKing = getKing(turnColor);
+        if (enemyKing.isInCheck() && enemyKing.getLegalMoves().isEmpty())
+            gameOver = "Checkmate!";
+        else if (isStaleMate())
+            gameOver = "Stalemate!";
+        if (gameOver != null) {
+            Dialogs.showGameOverDialog(getContext(),turnColor.opposite().name(),gameOver,null);
+        }
+
+    }
+
+    public Color getTurnColor() {
+        return turnColor;
     }
 }

@@ -21,11 +21,12 @@ public class Point extends AppCompatImageView {
         this.setLayoutParams(new FrameLayout.LayoutParams(size, size));
         setX(pos.x * size);
         setY(pos.y * size);
-        this.setImageResource(R.drawable.circle);
+        setImageResource(R.drawable.baseline_circle_24);
+        setScaleType(ScaleType.CENTER_INSIDE);
         this.setOnClickListener(this::onClick);
     }
 
     private void onClick(View view) {
-        creator.move(getContext(),pos);
+        creator.move(pos);
     }
 }

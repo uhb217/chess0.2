@@ -12,9 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chess02">
         <activity
+            android:name=".SignupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RoomActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

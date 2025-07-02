@@ -1,7 +1,7 @@
 package net.uhb217.chess02;
 
 import android.os.Bundle;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,8 +11,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Color;
-import net.uhb217.chess02.ux.pieces.Pawn;
-import net.uhb217.chess02.ux.Pos;
 
 public class MainActivity extends AppCompatActivity {
     private Board board;
@@ -26,13 +24,16 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        board = new Board(this, Color.BLACK);
-//        board.addView(new Pawn(this,new Pos(1,1), Color.BLACK));
 
-        ((LinearLayout)findViewById(R.id.main)).addView(board);
+        FrameLayout boardContainer = findViewById(R.id.board_container);
+        boardContainer.post(() -> {
+            int size = Math.min(boardContainer.getWidth(), boardContainer.getHeight());
+            board = new Board(this, Color.WHITE);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+            params.gravity = android.view.Gravity.CENTER;
+            board.setLayoutParams(params);
+            boardContainer.addView(board);
+        });
     }
 
-    public Board getBoard() {
-        return board;
-    }
 }

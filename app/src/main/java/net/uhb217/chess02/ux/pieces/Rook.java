@@ -8,10 +8,11 @@ import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.Color;
 import net.uhb217.chess02.ux.Pos;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Rook extends Piece{
+    private boolean hasMoved = false; // Track if the rook has moved for castling purposes
     public Rook(@NonNull Context ctx, Pos pos, Color color) {
         super(ctx, pos, color);
     }
@@ -22,7 +23,48 @@ public class Rook extends Piece{
     }
 
     @Override
-    public List<Pos> getLegalMoves() {
-        return Collections.emptyList();
+    public void move(int x, int y) {
+        super.move(x, y);
+        this.hasMoved = true; // Mark the rook as moved when it is moved
+    }
+
+    @Override
+    public List<Pos> getLegalMoves(Piece[][] board) {
+        List<Pos> legalMoves = new ArrayList<>();
+        int[] directions = {-1, 1};// Horizontal and vertical directions
+        for (int d : directions) {
+            // Move horizontally (left and right)
+            int x = pos.x + d;
+            while (x >= 0 && x <= 7) {
+                Piece piece = board[x][pos.y];
+                if (piece == null)
+                    legalMoves.add(new Pos(x, pos.y));
+                else {
+                    if (piece.color != this.color)
+                        legalMoves.add(new Pos(x, pos.y)); // Capture opponent piece
+                    break; // Stop if a piece is encountered
+                }
+                x += d;
+            }
+            // Move vertically (up and down)
+            int y = pos.y + d;
+            while (y >= 0 && y <= 7) {
+                Piece piece = board[pos.x][y];
+                if (piece == null)
+                    legalMoves.add(new Pos(pos.x, y));
+                else {
+                    if (piece.color != this.color)
+                        legalMoves.add(new Pos(pos.x, y)); // Capture opponent piece
+                    break; // Stop if a piece is encountered
+                }
+                y += d;
+            }
+        }
+
+        return legalMoves;
+    }
+
+    public boolean isMoved() {
+        return hasMoved;
     }
 }

@@ -1,10 +1,13 @@
 package net.uhb217.chess02;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,31 +16,28 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
     EditText username, password;
-    Button loginButton;
-    TextView signupText;
+    Button signupButton;
+    TextView loginText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        loginButton = findViewById(R.id.login_button);
-        loginButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, MainActivity.class));
-        });
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
-        loginButton = findViewById(R.id.login_button);
-        signupText = findViewById(R.id.signup_text);
+        signupButton = findViewById(R.id.signup_button);
+        loginText = findViewById(R.id.login_text);
 
-        loginButton.setOnClickListener(v ->{
+        signupButton.setOnClickListener(v -> {
             String user = username.getText().toString();
             String pass = password.getText().toString();
             if (user.isEmpty() || pass.isEmpty()) {
@@ -46,18 +46,19 @@ public class LoginActivity extends AppCompatActivity {
                 password.setError("Password cannot be empty");
             } else {
                 String fakeEmail = user.toLowerCase() + "@chess.app.com";
-                FirebaseAuth.getInstance().signInWithEmailAndPassword(fakeEmail,pass)
+                FirebaseAuth.getInstance().createUserWithEmailAndPassword(fakeEmail, pass)
                         .addOnSuccessListener(authResult -> {
-                            Intent intent = new Intent(this, RoomActivity.class);
-                            intent.putExtra("username", user);
-                            startActivity(intent);
+                            startActivity(new Intent(this, LoginActivity.class));
+                            Toast.makeText(this,"Signup successful", Toast.LENGTH_SHORT).show();
                         })
                         .addOnFailureListener(e -> {
-                            username.setError("Invalid username or password");
-                            password.setError("Invalid username or password");
+                            if (e instanceof FirebaseAuthUserCollisionException)
+                                username.setError("Username already exists");
+                            else
+                                Log.e("SignupActivity", "Signup failed", e);
                         });
             }
         });
-
+        loginText.setOnClickListener(view -> startActivity(new Intent(this, LoginActivity.class)));
     }
 }

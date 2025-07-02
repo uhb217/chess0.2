@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/promotion_background"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <GridLayout
+        android:id="@+id/promotionGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="2"
+        android:alignmentMode="alignMargins"
+        android:useDefaultMargins="true"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/promoQueen"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/input_field_background"
+            android:scaleType="fitCenter"
+            android:contentDescription="Queen" />
+
+        <ImageButton
+            android:id="@+id/promoRook"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/input_field_background"
+            android:scaleType="fitCenter"
+            android:contentDescription="Rook" />
+
+        <ImageButton
+            android:id="@+id/promoBishop"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/input_field_background"
+            android:scaleType="fitCenter"
+            android:contentDescription="Bishop" />
+
+        <ImageButton
+            android:id="@+id/promoKnight"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/input_field_background"
+            android:scaleType="fitCenter"
+            android:contentDescription="Knight" />
+    </GridLayout>
+</LinearLayout>

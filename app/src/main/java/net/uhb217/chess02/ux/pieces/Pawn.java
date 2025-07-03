@@ -34,7 +34,7 @@ public class Pawn extends Piece {
       board.removeView(board.getPiece(x, y - d));
       board.movePieceInTheArray(x, y, x, y - d);
     }
-    place(x, y);
+    placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);
     board.enPassant = null;
@@ -58,7 +58,7 @@ public class Pawn extends Piece {
             break;
         }
         if (newPiece != null) {
-          newPiece.place(x, y);
+          newPiece.placeAt(x, y);
           board.addView(newPiece);
           board.nextTurn();
         }

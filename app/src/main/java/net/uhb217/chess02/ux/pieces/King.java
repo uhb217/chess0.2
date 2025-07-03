@@ -28,9 +28,9 @@ public class King extends Piece {
   public void move(int x, int y) {
     int d = Board.getInstance().getColor() == Color.WHITE ? 1 : -1;
     if (pos.x + 2 * d == x)//kingSide castle
-      Board.getInstance().getPiece(new Pos(pos.x + 3 * d, y)).place(x - d, y); // Move the rook during castling
+      Board.getInstance().getPiece(new Pos(pos.x + 3 * d, y)).placeAt(x - d, y); // Move the rook during castling
     else if (pos.x - 2 * d == x)//queenSide castle
-      Board.getInstance().getPiece(new Pos(pos.x - 4 * d, y)).place(x + d, y); // Move the rook during castling
+      Board.getInstance().getPiece(new Pos(pos.x - 4 * d, y)).placeAt(x + d, y); // Move the rook during castling
     super.move(x, y);
     hasMoved = true; // Mark the king as moved when it is moved
 

@@ -6,6 +6,11 @@ import android.content.Context;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.annotations.NotNull;
+
 import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.pieces.Bishop;
 import net.uhb217.chess02.ux.pieces.King;
@@ -28,16 +33,18 @@ public class Board extends FrameLayout {
   public Pos enPassant = null; // For en passant capture
   private Color color;
   private Color turnColor = WHITE; // Default turn color
+  public final DatabaseReference db;
 
-  public Board(Context ctx, Color color) {
+  public Board(Context ctx, Color color,@NotNull String roomId) {
     super(ctx);
+    this.db = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
     this.color = color;
     int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
     LayoutParams params = new LayoutParams(screenWidth, screenWidth);
     params.gravity = Gravity.CENTER_HORIZONTAL;
     setLayoutParams(params);
 
-    setBackground(ctx.getDrawable(R.drawable.chessboard));
+    setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
     instance = this;
     initializeBoard();
   }
@@ -166,5 +173,20 @@ public class Board extends FrameLayout {
 
   public Color getTurnColor() {
     return turnColor;
+  }
+  public void sendMoveToFirebase(String move){
+    if (db == null)
+      throw new IllegalStateException("Database reference is not initialized.");
+
+    db.child("moves").get().addOnSuccessListener(dataSnapshot -> {
+      if (dataSnapshot.exists()){
+        List<String> moves = new ArrayList<>();
+        for (DataSnapshot child : dataSnapshot.getChildren())
+          moves.add(child.getValue(String.class));
+        moves.add(move);
+        db.child("moves").setValue(moves);
+      }else
+        db.child("moves").setValue(List.of(move));
+    });
   }
 }

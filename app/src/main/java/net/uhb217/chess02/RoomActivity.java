@@ -35,7 +35,6 @@ import java.util.Random;
 public class RoomActivity extends AppCompatActivity {
   Button createRoomButton, joinButton;
   EditText roomIdInput;
-  String username = "?";
   private String createdRoomId = null;
 
   @Override
@@ -48,7 +47,7 @@ public class RoomActivity extends AppCompatActivity {
       v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
       return insets;
     });
-    username = getIntent().getStringExtra("username");
+
 
     createRoomButton = findViewById(R.id.create_room_button);
     joinButton = findViewById(R.id.join_button);
@@ -182,11 +181,4 @@ public class RoomActivity extends AppCompatActivity {
     startActivity(intent);
   }
 
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    if (createdRoomId != null) {
-      FirebaseDatabase.getInstance().getReference("rooms").child(createdRoomId).removeValue();
-    }
-  }
 }

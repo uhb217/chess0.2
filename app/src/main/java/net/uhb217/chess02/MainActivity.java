@@ -2,6 +2,8 @@ package net.uhb217.chess02;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
+import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,16 +40,26 @@ public class MainActivity extends AppCompatActivity {
     });
 
     mainPlayer = (Player) getIntent().getSerializableExtra("mainPlayer");
-    opponentPlayer = (Player) getIntent().getSerializableExtra("opponentPlayer");
+    opponentPlayer = (Player) getIntent().getSerializableExtra("opponentPlayer");//TODO: move tests
+//    mainPlayer = new Player("uhb217", 1600, Color.BLACK);
+//    opponentPlayer = new Player("Opponent", 1600, Color.BLACK);
 
     rootLayout = findViewById(R.id.main);
-    board = new Board(this, mainPlayer.getColor());
+    board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
     topPlayerInfoView = new PlayerInfoView(this, opponentPlayer);
     bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer);
 
     rootLayout.addView(topPlayerInfoView);
     rootLayout.addView(board);
     rootLayout.addView(bottomPlayerInfoView);
+
+    EditText move = new EditText(this);
+    move.setHint("Enter move (e.g., e2e4)");
+    Button btn = new Button(this);
+    btn.setText("Play Move");
+    btn.setOnClickListener(view -> BoardUtils.playMove(BoardUtils.stringFormat2Move(move.getText().toString())));
+    rootLayout.addView(move);
+    rootLayout.addView(btn);
   }
 
   @Override

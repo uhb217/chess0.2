@@ -1,6 +1,7 @@
 package net.uhb217.chess02.ux.pieces;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -8,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import net.uhb217.chess02.ux.Board;
+import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Point;
 import net.uhb217.chess02.ux.utils.Pos;
@@ -75,20 +77,26 @@ public abstract class Piece extends AppCompatImageView {
     setLayoutParams(new FrameLayout.LayoutParams(SIZE, SIZE));
   }
 
-  public void move(Pos pos) {
-    move(pos.x, pos.y);
+  public void move(Pos newPos){
+    move(newPos.x, newPos.y);
   }
 
+  /**
+   * Moves the piece to the specified position and updates the board state.
+   * Pawn completely overrides this.
+   * In King and Rook its with extra logic for castling.
+   */
   public void move(int x, int y) {
     Board board = Board.getInstance();
-    place(x, y);
+    board.sendMoveToFirebase(BoardUtils.move2StringFormat(pos.x, pos.y, x, y));
+    placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);
     board.enPassant = null; // Reset en passant target square after a move
     board.nextTurn();
   }
 
-  public void place(int x, int y) {
+  public void placeAt(int x, int y) {
     Board board = Board.getInstance();
     if (board.getPiece(x, y) != null)
       board.removeView(board.getPiece(x, y));

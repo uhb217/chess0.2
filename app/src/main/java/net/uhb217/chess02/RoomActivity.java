@@ -114,15 +114,15 @@ public class RoomActivity extends AppCompatActivity {
             roomRef.child("player1").setValue(player);
 
             roomRef.child("player2").addValueEventListener(FirebaseUtils.ValueListener(snapshot1 -> {
-              Log.d("RoomActivity", "Player2 data changed: " + snapshot.getValue());
-              if (!triggered && snapshot.exists()) {
+              Log.d("RoomActivity", "Player2 data changed: " + snapshot1.getValue());
+              if (!triggered && snapshot1.exists()) {
                 triggered = true;
-                startGameActivity(roomId, player, snapshot.getValue(Player.class));
+                startGameActivity(roomId, player, snapshot1.getValue(Player.class));
               }
             }));
           } else {
             Log.e("Player", "Failed to fetch player data");
-            waitingDialog.dismiss();
+            Dialogs.dismissWaitingDialog();
           }
         });
       }
@@ -150,4 +150,9 @@ public class RoomActivity extends AppCompatActivity {
     startActivity(intent);
   }
 
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    Dialogs.dismissWaitingDialog();
+  }
 }

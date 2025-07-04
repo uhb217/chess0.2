@@ -19,8 +19,10 @@ import net.uhb217.chess02.ux.pieces.Pawn;
 import net.uhb217.chess02.ux.pieces.Piece;
 import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
+import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.Pos;
 
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class Board extends FrameLayout {
     setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
     instance = this;
     initializeBoard();
+    startListeningForOpponentMoves();
   }
 
   private void initializeBoard() {
@@ -188,5 +191,22 @@ public class Board extends FrameLayout {
       }else
         db.child("moves").setValue(List.of(move));
     });
+  }
+  private void startListeningForOpponentMoves() {
+    if (db == null)
+      throw new IllegalStateException("Database reference is not initialized.");
+
+    db.child("moves").addValueEventListener(FirebaseUtils.ValueListener(snapshot -> {
+      if (snapshot.exists()) {
+        List<String> moves = new ArrayList<>();
+        for (DataSnapshot child : snapshot.getChildren())
+          moves.add(child.getValue(String.class));
+        if (!moves.isEmpty()) {
+          String lastMove = moves.get(moves.size() - 1);
+          if (!lastMove.isEmpty())
+            BoardUtils.playMove(BoardUtils.stringFormat2Move(lastMove));//TODO: solve recursion issue
+        }
+      }
+    }));
   }
 }

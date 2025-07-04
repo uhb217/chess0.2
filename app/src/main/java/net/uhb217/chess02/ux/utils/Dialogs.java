@@ -126,7 +126,11 @@ public class Dialogs {
     });
     return waitingDialog;
   }
-
+public static void dismissWaitingDialog() {
+    if (waitingDialog != null && waitingDialog.isShowing()) {
+      waitingDialog.dismiss();
+    }
+  }
   public static Dialog loginWaitingDialog(Context ctx) {
     Dialog dialog = new Dialog(ctx);
     View dialogView = LayoutInflater.from(ctx).inflate(R.layout.login_waiting_dialog, null);

@@ -1,10 +1,7 @@
 package net.uhb217.chess02.ux.utils;
 
 import net.uhb217.chess02.ux.Board;
-import net.uhb217.chess02.ux.pieces.King;
-import net.uhb217.chess02.ux.pieces.Pawn;
 import net.uhb217.chess02.ux.pieces.Piece;
-import net.uhb217.chess02.ux.pieces.Rook;
 
 public class BoardUtils {
   public static void playMove(Move move){

@@ -4,38 +4,33 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ux.utils.FirebaseUtils;
 
-import java.io.Serializable;
 import java.util.Random;
 
 public class RoomActivity extends AppCompatActivity {
   Button createRoomButton, joinButton;
   EditText roomIdInput;
-  private String createdRoomId = null;
+  private boolean triggered = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -71,33 +66,24 @@ public class RoomActivity extends AppCompatActivity {
 
       DatabaseReference roomRef = FirebaseDatabase.getInstance()
           .getReference("rooms").child(roomId);
-      roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-          if (!snapshot.exists()) {
-            roomIdInput.setError("Room does not exist");
-            return;
-          }
-          Player player1 = snapshot.child("player1").getValue(Player.class);
-          Player player2 = snapshot.child("player2").getValue(Player.class);
-          if (player2 != null || player1 == null) {
-            roomIdInput.setError("Room is already full or closed");
-            return;
-          }
-
-          Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
-            player.setColor(player1.getColor().opposite());
-            roomRef.child("player2").setValue(player)
-                .addOnSuccessListener(unused -> startGameActivity(roomId, player, player1));
-          });
+      roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+        if (!snapshot.exists()) {
+          roomIdInput.setError("Room does not exist");
+          return;
+        }
+        Player player1 = snapshot.child("player1").getValue(Player.class);
+        Player player2 = snapshot.child("player2").getValue(Player.class);
+        if (player2 != null || player1 == null) {
+          roomIdInput.setError("Room is already full or closed");
+          return;
         }
 
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-
-        }
-      });
-
+        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
+          player.setColor(player1.getColor().opposite());
+          roomRef.child("player2").setValue(player)
+              .addOnSuccessListener(unused -> startGameActivity(roomId, player, player1));
+        });
+      }));
     });
 
 
@@ -116,49 +102,31 @@ public class RoomActivity extends AppCompatActivity {
     String roomId = generateRoomId();
     DatabaseReference roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
 
-    roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
-      @Override
-      public void onDataChange(@NonNull DataSnapshot snapshot) {
-        if (snapshot.exists()) {
-          // Retry if room already exists
-          tryGenerateRoom(context, attempts + 1);
-        } else {
-          Dialog waitingDialog = Dialogs.showWaitingDialog(context, roomId, roomRef::removeValue);
-          createdRoomId = roomId;
-          // Room is safe to create
-          Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
-            if (player != null) {
-              player.setColor(new Random().nextBoolean() ? Color.WHITE : Color.BLACK);
-              roomRef.child("player1").setValue(player);
+    roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+      if (snapshot.exists())// Retry if room already exists
+        tryGenerateRoom(context, attempts + 1);
+      else {
+        Dialog waitingDialog = Dialogs.showWaitingDialog(context, roomId, roomRef::removeValue);
+        // Room is safe to create
+        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
+          if (player != null) {
+            player.setColor(new Random().nextBoolean() ? Color.WHITE : Color.BLACK);
+            roomRef.child("player1").setValue(player);
 
-              roomRef.child("player2").addValueEventListener(new ValueEventListener() {
-                private boolean triggered = false;
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                  Log.d("RoomActivity", "Player2 data changed: " + snapshot.getValue());
-                  if (!triggered && snapshot.exists()) {
-                    triggered = true;
-                    startGameActivity(roomId, player, snapshot.getValue(Player.class));
-                  }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
-              });
-            } else {
-              Log.e("Player", "Failed to fetch player data");
-              waitingDialog.dismiss();
-            }
-          });
-        }
+            roomRef.child("player2").addValueEventListener(FirebaseUtils.ValueListener(snapshot1 -> {
+              Log.d("RoomActivity", "Player2 data changed: " + snapshot.getValue());
+              if (!triggered && snapshot.exists()) {
+                triggered = true;
+                startGameActivity(roomId, player, snapshot.getValue(Player.class));
+              }
+            }));
+          } else {
+            Log.e("Player", "Failed to fetch player data");
+            waitingDialog.dismiss();
+          }
+        });
       }
-
-      @Override
-      public void onCancelled(@NonNull DatabaseError error) {
-        Toast.makeText(context, "Error checking room ID", Toast.LENGTH_SHORT).show();
-      }
-    });
+    }));
   }
 
   private static String generateRoomId() {
@@ -172,6 +140,7 @@ public class RoomActivity extends AppCompatActivity {
 
     return id.toString(); // e.g., "G2K9X7"
   }
+
   private void startGameActivity(String roomId, Player mainPlayer, Player opponentPlayer) {
     Intent intent = new Intent(this, MainActivity.class);
     intent.putExtra("mainPlayer", mainPlayer);

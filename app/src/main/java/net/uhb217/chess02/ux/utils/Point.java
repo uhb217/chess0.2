@@ -1,7 +1,6 @@
 package net.uhb217.chess02.ux.utils;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 

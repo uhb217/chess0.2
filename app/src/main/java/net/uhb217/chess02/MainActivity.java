@@ -1,7 +1,6 @@
 package net.uhb217.chess02;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -12,15 +11,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.BoardUtils;
-import net.uhb217.chess02.ux.utils.Color;
 
 public class MainActivity extends AppCompatActivity {
   private Board board;

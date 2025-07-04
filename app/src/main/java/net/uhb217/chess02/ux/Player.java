@@ -1,15 +1,11 @@
 package net.uhb217.chess02.ux;
 
-import androidx.annotation.NonNull;
-
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.FirebaseUtils;
 
 import java.io.Serializable;
 
@@ -50,31 +46,22 @@ public class Player implements Serializable {
       DatabaseReference ref = FirebaseDatabase.getInstance()
               .getReference("users")
               .child(username);
+      ref.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+        if (!snapshot.exists()) {
+          callback.onPlayerFetched(null);
+          return;
+        }
 
-      ref.addListenerForSingleValueEvent(new ValueEventListener() {
-          @Override
-          public void onDataChange(@NonNull DataSnapshot snapshot) {
-              if (!snapshot.exists()) {
-                  callback.onPlayerFetched(null);
-                  return;
-              }
+        Integer rating = snapshot.child("rating").getValue(Integer.class);
 
-              Integer rating = snapshot.child("rating").getValue(Integer.class);
+        if (rating == null) {
+          callback.onPlayerFetched(null);
+          return;
+        }
 
-              if (rating == null) {
-                  callback.onPlayerFetched(null);
-                  return;
-              }
-
-              Player player = new Player(username, rating);
-              callback.onPlayerFetched(player);
-          }
-
-          @Override
-          public void onCancelled(@NonNull DatabaseError error) {
-              callback.onPlayerFetched(null);
-          }
-      });
+        Player player = new Player(username, rating);
+        callback.onPlayerFetched(player);
+      }));
   }
   public static void fromFirebaseUser(FirebaseUser user, PlayerCallback callback) {
     if (user == null) {

@@ -10,10 +10,10 @@ public class BoardUtils {
       throw new IllegalArgumentException("Move or its positions cannot be null");
 
     Piece movingPiece = board.getPiece(move.from);
-    if (movingPiece == null) throw new IllegalArgumentException("No piece at the from position: " + move.from);
-    if (!Pos.contains(movingPiece.getLegalMoves(), move.to)) throw new IllegalArgumentException("Move has to be legal");
+    if (movingPiece == null) return; // No piece at the 'from' position
+    if (!Pos.contains(movingPiece.getLegalMoves(), move.to)) return;
 
-    movingPiece.move(move.to.x, move.to.y);
+    movingPiece.move(move.to.x, move.to.y,false);
   }
   public static Move stringFormat2Move(String move) {
     if (move.length() != 4 || !Character.isLetter(move.charAt(0)) || !Character.isDigit(move.charAt(1)) ||

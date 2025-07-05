@@ -197,7 +197,7 @@ public class Board extends FrameLayout {
       throw new IllegalStateException("Database reference is not initialized.");
 
     db.child("moves").addValueEventListener(FirebaseUtils.ValueListener(snapshot -> {
-      if (snapshot.exists()) {
+      if (snapshot.exists() && turnColor == color.opposite()) {
         List<String> moves = new ArrayList<>();
         for (DataSnapshot child : snapshot.getChildren())
           moves.add(child.getValue(String.class));

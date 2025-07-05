@@ -1,7 +1,13 @@
 package net.uhb217.chess02.ux.utils;
 
+import android.content.Context;
+
 import net.uhb217.chess02.ux.Board;
+import net.uhb217.chess02.ux.pieces.Bishop;
+import net.uhb217.chess02.ux.pieces.Knight;
 import net.uhb217.chess02.ux.pieces.Piece;
+import net.uhb217.chess02.ux.pieces.Queen;
+import net.uhb217.chess02.ux.pieces.Rook;
 
 public class BoardUtils {
   public static void playMove(Move move){
@@ -13,12 +19,28 @@ public class BoardUtils {
     if (movingPiece == null) return; // No piece at the 'from' position
     if (!Pos.contains(movingPiece.getLegalMoves(), move.to)) return;
 
-    movingPiece.move(move.to.x, move.to.y,false);
+    if (move.premotion == '?')
+      movingPiece.move(move.to.x, move.to.y,false);
+    else {
+      movingPiece.placeAt(move.to.x, move.to.y);
+      board.enPassant = null;
+      Piece newPiece = newPieceFromChar(move.premotion, movingPiece.getContext(), move.to, movingPiece.getColor());
+      if (newPiece != null) {
+        newPiece.placeAt(move.to.x, move.to.y);
+        board.addView(newPiece);
+        board.nextTurn();
+      }
+    }
   }
   public static Move stringFormat2Move(String move) {
+    char premotion = '?';
     if (move.length() != 4 || !Character.isLetter(move.charAt(0)) || !Character.isDigit(move.charAt(1)) ||
-        !Character.isLetter(move.charAt(2)) || !Character.isDigit(move.charAt(3)))
-      throw new IllegalArgumentException("Invalid move format: " + move);
+        !Character.isLetter(move.charAt(2)) || !Character.isDigit(move.charAt(3))){
+      if (move.length() == 5 && Character.isLetter(move.charAt(4)))
+        premotion = move.charAt(4);
+      else
+        throw new IllegalArgumentException("Invalid move format: " + move);
+    }
 
     boolean white = Board.getInstance().getColor() == Color.WHITE;
 
@@ -42,14 +64,37 @@ public class BoardUtils {
 
     return "" + fromFile + fromRank + toFile + toRank;
   }
-
+  public static Piece newPieceFromChar(char pieceChar, Context ctx, Pos pos, Color color){
+    Piece newPiece = null;
+    switch (pieceChar) {
+      case 'q':
+        newPiece = new Queen(ctx, pos, color);
+        break;
+      case 'r':
+        newPiece = new Rook(ctx, pos, color);
+        break;
+      case 'b':
+        newPiece = new Bishop(ctx, pos, color);
+        break;
+      case 'n':
+        newPiece = new Knight(ctx, pos, color);
+        break;
+    }
+    return newPiece;
+  }
   public static class Move{
     public final Pos from;
     public final Pos to;
-
+    public final char premotion;
+    public Move(Pos from, Pos to, char premotion) {
+      this.from = from;
+      this.to = to;
+      this.premotion = premotion;
+    }
     public Move(Pos from, Pos to) {
       this.from = from;
       this.to = to;
+      this.premotion = '?';
     }
 
   }

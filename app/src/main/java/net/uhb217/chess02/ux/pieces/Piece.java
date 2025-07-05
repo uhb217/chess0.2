@@ -102,6 +102,11 @@ public abstract class Piece extends AppCompatImageView {
     board.nextTurn();
   }
 
+  /**
+   * Places the piece at the specified position on the board and removes it from the old position.
+   * @param x the target x-coordinate
+   * @param y the target y-coordinate
+   */
   public void placeAt(int x, int y) {
     Board board = Board.getInstance();
     if (board.getPiece(x, y) != null)

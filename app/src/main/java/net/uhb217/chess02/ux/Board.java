@@ -204,7 +204,7 @@ public class Board extends FrameLayout {
         if (!moves.isEmpty()) {
           String lastMove = moves.get(moves.size() - 1);
           if (!lastMove.isEmpty())
-            BoardUtils.playMove(BoardUtils.stringFormat2Move(lastMove));//TODO: solve recursion issue
+            BoardUtils.playMove(BoardUtils.stringFormat2Move(lastMove));
         }
       }
     }));

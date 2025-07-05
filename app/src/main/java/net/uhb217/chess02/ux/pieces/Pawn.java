@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.Board;
+import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.Pos;
@@ -27,8 +28,9 @@ public class Pawn extends Piece {
   }
 
   @Override
-  public void move(int x, int y) {
+  public void move(int x, int y, boolean updateFirebase) {
     Board board = Board.getInstance();
+    int lastX = pos.x;
     int lastY = pos.y;
     if (pos.x != x && board.getPiece(x, y) == null) {
       board.removeView(board.getPiece(x, y - d));
@@ -42,22 +44,9 @@ public class Pawn extends Piece {
       board.enPassant = new Pos(x, lastY + d); // Set en passant target square
     if (y == (color == Board.getInstance().getColor() ? 0 : 7)) {//premotion
       Dialogs.showPromotionDialog(getContext(), color, pieceChar -> {
-        Piece newPiece = null;
-        switch (pieceChar) {
-          case 'q':
-            newPiece = new Queen(getContext(), new Pos(x, y), color);
-            break;
-          case 'r':
-            newPiece = new Rook(getContext(), new Pos(x, y), color);
-            break;
-          case 'b':
-            newPiece = new Bishop(getContext(), new Pos(x, y), color);
-            break;
-          case 'n':
-            newPiece = new Knight(getContext(), new Pos(x, y), color);
-            break;
-        }
+        Piece newPiece = BoardUtils.newPieceFromChar(pieceChar, getContext(), new Pos(x, y), color);
         if (newPiece != null) {
+          if (updateFirebase) board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX,lastY,x, y) + pieceChar);
           newPiece.placeAt(x, y);
           board.addView(newPiece);
           board.nextTurn();
@@ -65,7 +54,8 @@ public class Pawn extends Piece {
       });
     } else
       board.nextTurn();
-
+    if (updateFirebase)
+      board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX,lastY,x, y));
   }
 
   @Override

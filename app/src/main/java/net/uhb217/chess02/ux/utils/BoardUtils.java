@@ -38,7 +38,7 @@ public class BoardUtils {
    * @return new Move
    * @see Move
    */
-  public static Move stringFormat2Move(String move) {
+  public static Move UCI2Move(String move) {
     char premotion = '?';
     if (move.length() != 4 || !Character.isLetter(move.charAt(0)) || !Character.isDigit(move.charAt(1)) ||
         !Character.isLetter(move.charAt(2)) || !Character.isDigit(move.charAt(3))){
@@ -54,10 +54,10 @@ public class BoardUtils {
     int fromY = white ? 8 - (move.charAt(1) - '0') : move.charAt(1) - '0' - 1;
     int toX   = white ? move.charAt(2) - 'a' : 'h' - move.charAt(2);
     int toY   = white ? 8 - (move.charAt(3) - '0') : move.charAt(3) - '0' - 1;
-    return new Move(new Pos(fromX, fromY), new Pos(toX, toY));
+    return new Move(new Pos(fromX, fromY), new Pos(toX, toY), premotion);
   }
-  public static String move2StringFormat(Pos from, Pos to) {
-    return move2StringFormat(from.x, from.y, to.x, to.y);
+  public static String move2UCI(Pos from, Pos to) {
+    return move2UCI(from.x, from.y, to.x, to.y);
   }
 
   /**
@@ -67,7 +67,7 @@ public class BoardUtils {
    * @param toY
    * @return move in UCI format
    */
-  public static String move2StringFormat(int fromX, int fromY, int toX, int toY) {
+  public static String move2UCI(int fromX, int fromY, int toX, int toY) {
     boolean white = Board.getInstance().getColor() == Color.WHITE;
 
     char fromFile = white ? (char) (fromX + 'a') : (char) ('h' - fromX);
@@ -106,9 +106,7 @@ public class BoardUtils {
       this.premotion = premotion;
     }
     public Move(Pos from, Pos to) {
-      this.from = from;
-      this.to = to;
-      this.premotion = '?';
+      this(from, to, '?');
     }
 
   }

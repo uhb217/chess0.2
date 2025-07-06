@@ -21,7 +21,6 @@ import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
-import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.Pos;
 
@@ -192,7 +191,7 @@ public class Board extends FrameLayout {
         if (!moves.isEmpty()) {
           String lastMove = moves.get(moves.size() - 1);
           if (!lastMove.isEmpty())
-            BoardUtils.playMove(BoardUtils.stringFormat2Move(lastMove));
+            BoardUtils.playMove(BoardUtils.UCI2Move(lastMove));
         }
       }
     }));

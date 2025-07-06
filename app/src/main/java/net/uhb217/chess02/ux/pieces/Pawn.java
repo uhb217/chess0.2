@@ -46,7 +46,7 @@ public class Pawn extends Piece {
       Dialogs.showPromotionDialog(getContext(), color, pieceChar -> {
         Piece newPiece = BoardUtils.newPieceFromChar(pieceChar, getContext(), new Pos(x, y), color);
         if (newPiece != null) {
-          if (bySystem) board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX,lastY,x, y) + pieceChar);
+          if (bySystem) board.sendMoveToFirebase(BoardUtils.move2UCI(lastX,lastY,x, y) + pieceChar);
           newPiece.placeAt(x, y);
           board.addView(newPiece);
           board.nextTurn();
@@ -55,7 +55,7 @@ public class Pawn extends Piece {
     } else {
       board.nextTurn();
       if (bySystem)
-        board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX, lastY, x, y));
+        board.sendMoveToFirebase(BoardUtils.move2UCI(lastX, lastY, x, y));
     }
   }
 

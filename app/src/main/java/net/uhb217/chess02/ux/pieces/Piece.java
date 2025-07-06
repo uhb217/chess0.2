@@ -94,7 +94,7 @@ public abstract class Piece extends AppCompatImageView {
   public void move(int x, int y, boolean bySystem) {
     Board board = Board.getInstance();
     if (bySystem)
-      board.sendMoveToFirebase(BoardUtils.move2StringFormat(pos.x, pos.y, x, y));
+      board.sendMoveToFirebase(BoardUtils.move2UCI(pos.x, pos.y, x, y));
     placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);
@@ -103,7 +103,7 @@ public abstract class Piece extends AppCompatImageView {
   }
 
   /**
-   * Places the piece at the specified position on the board and removes it from the old position.
+   * Places the piece at the specified position on the board array and removes it from the old position.
    * @param x the target x-coordinate
    * @param y the target y-coordinate
    */

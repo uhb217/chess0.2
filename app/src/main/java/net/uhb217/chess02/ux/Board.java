@@ -128,10 +128,7 @@ public class Board extends FrameLayout {
   }
 
   private boolean isStaleMate() {
-    for (Piece piece : getPieces(turnColor))
-      if (!piece.getLegalMoves().isEmpty())
-        return false; // If any piece has legal moves, return true
-    return true; // No pieces with legal moves
+    return false;
   }
 
   public Color getColor() {
@@ -161,16 +158,7 @@ public class Board extends FrameLayout {
 
   public void nextTurn() {
     turnColor = turnColor.opposite();
-    //check if the game is over
-    String gameOver = null;
-    King enemyKing = getKing(turnColor);
-    if (enemyKing.isInCheck() && enemyKing.getLegalMoves().isEmpty())
-      gameOver = "Checkmate!";
-    else if (isStaleMate())
-      gameOver = "Stalemate!";
-    if (gameOver != null) {
-      Dialogs.showGameOverDialog(getContext(), turnColor.opposite().name(), gameOver, null);
-    }
+    //TODO: check if the game is over(mates and stalemates)
 
   }
 

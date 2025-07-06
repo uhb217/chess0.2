@@ -28,7 +28,7 @@ public class Pawn extends Piece {
   }
 
   @Override
-  public void move(int x, int y, boolean updateFirebase) {
+  public void move(int x, int y, boolean bySystem) {
     Board board = Board.getInstance();
     int lastX = pos.x;
     int lastY = pos.y;
@@ -46,16 +46,17 @@ public class Pawn extends Piece {
       Dialogs.showPromotionDialog(getContext(), color, pieceChar -> {
         Piece newPiece = BoardUtils.newPieceFromChar(pieceChar, getContext(), new Pos(x, y), color);
         if (newPiece != null) {
-          if (updateFirebase) board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX,lastY,x, y) + pieceChar);
+          if (bySystem) board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX,lastY,x, y) + pieceChar);
           newPiece.placeAt(x, y);
           board.addView(newPiece);
           board.nextTurn();
         }
       });
-    } else
+    } else {
       board.nextTurn();
-    if (updateFirebase)
-      board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX,lastY,x, y));
+      if (bySystem)
+        board.sendMoveToFirebase(BoardUtils.move2StringFormat(lastX, lastY, x, y));
+    }
   }
 
   @Override

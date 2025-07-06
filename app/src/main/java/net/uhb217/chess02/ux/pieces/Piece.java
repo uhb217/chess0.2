@@ -37,11 +37,11 @@ public abstract class Piece extends AppCompatImageView {
 
   public List<Pos> getLegalMoves() {
     Board board = Board.getInstance();
-    if (board.getColor() == board.getTurnColor())
-      return List.of(); // No legal moves if it's not this piece's turn
-    return this instanceof King ? getLegalMoves(board.getBoard()) :
+    if (board.getTurnColor() == board.getColor() && board.getTurnColor() == color)
+      return this instanceof King ? getLegalMoves(board.getBoard()) :
         getLegalMoves(board.getBoard()).stream()
             .filter(p -> !isPinnedToKing(p)).collect(Collectors.toList());
+    return List.of();
   }
 
   public boolean isPinnedToKing(Pos newPos) {
@@ -89,11 +89,11 @@ public abstract class Piece extends AppCompatImageView {
    * In King and Rook its with extra logic for castling.
    * @param x the target x-coordinate
    * @param y the target y-coordinate
-   * @param updateFirebase whether to update the Firebase database with this move(recursion prevention)
+   * @param bySystem whether to update the Firebase database with this move(recursion prevention)
    */
-  public void move(int x, int y, boolean updateFirebase) {
+  public void move(int x, int y, boolean bySystem) {
     Board board = Board.getInstance();
-    if (updateFirebase)
+    if (bySystem)
       board.sendMoveToFirebase(BoardUtils.move2StringFormat(pos.x, pos.y, x, y));
     placeAt(x, y);
     removeAllPoints();

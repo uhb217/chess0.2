@@ -17,7 +17,6 @@ public class BoardUtils {
 
     Piece movingPiece = board.getPiece(move.from);
     if (movingPiece == null) return; // No piece at the 'from' position
-    if (!Pos.contains(movingPiece.getLegalMoves(), move.to)) return;
 
     if (move.premotion == '?')
       movingPiece.move(move.to.x, move.to.y,false);
@@ -32,6 +31,13 @@ public class BoardUtils {
       }
     }
   }
+
+
+  /**
+   * @param move in UCI format
+   * @return new Move
+   * @see Move
+   */
   public static Move stringFormat2Move(String move) {
     char premotion = '?';
     if (move.length() != 4 || !Character.isLetter(move.charAt(0)) || !Character.isDigit(move.charAt(1)) ||
@@ -53,6 +59,14 @@ public class BoardUtils {
   public static String move2StringFormat(Pos from, Pos to) {
     return move2StringFormat(from.x, from.y, to.x, to.y);
   }
+
+  /**
+   * @param fromX
+   * @param fromY
+   * @param toX
+   * @param toY
+   * @return move in UCI format
+   */
   public static String move2StringFormat(int fromX, int fromY, int toX, int toY) {
     boolean white = Board.getInstance().getColor() == Color.WHITE;
 

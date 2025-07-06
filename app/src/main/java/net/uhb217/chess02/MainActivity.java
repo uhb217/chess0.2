@@ -1,5 +1,6 @@
 package net.uhb217.chess02;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,12 +50,10 @@ public class MainActivity extends AppCompatActivity {
     rootLayout.addView(board);
     rootLayout.addView(bottomPlayerInfoView);
 
-    EditText move = new EditText(this);
-    move.setHint("Enter move (e.g., e2e4)");
+
     Button btn = new Button(this);
     btn.setText("Play Move");
-    btn.setOnClickListener(view -> BoardUtils.playMove(BoardUtils.stringFormat2Move(move.getText().toString())));
-    rootLayout.addView(move);
+    btn.setOnClickListener(view -> startActivity(new Intent(this, RoomActivity.class)));
     rootLayout.addView(btn);
   }
 

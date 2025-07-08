@@ -91,7 +91,7 @@ public abstract class Piece extends AppCompatImageView {
     move(pos.x, pos.y);
   }
   public void  move(int x, int y){
-    move(x, y, true);//TODO: move tests
+    move(x, y, false);//TODO: move tests
 //    move(x, y, false);
   }
 
@@ -105,13 +105,13 @@ public abstract class Piece extends AppCompatImageView {
    */
   public void move(int x, int y, boolean bySystem) {
     Board board = Board.getInstance();
-    if (bySystem)
+    if (!bySystem)
       board.sendMoveToFirebase(BoardUtils.move2UCI(pos.x, pos.y, x, y));
     placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);
     board.enPassant = null; // Reset en passant target square after a move
-    board.nextTurn();
+    board.nextTurn(bySystem);
   }
 
   /**

@@ -9,6 +9,10 @@ import net.uhb217.chess02.ux.pieces.Piece;
 import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
 
+import org.jetbrains.annotations.NotNull;
+
+import kotlin.Unit;
+
 public class BoardUtils {
   public static void playMove(Move move){
     Board board = Board.getInstance();
@@ -16,10 +20,10 @@ public class BoardUtils {
       throw new IllegalArgumentException("Move or its positions cannot be null");
 
     Piece movingPiece = board.getPiece(move.from);
-    if (movingPiece == null) return; // No piece at the 'from' position
+    if (movingPiece == null) return;
 
     if (move.premotion == '?')
-      movingPiece.move(move.to.x, move.to.y,false);
+      movingPiece.move(move.to.x, move.to.y,true);
     else {
       movingPiece.placeAt(move.to.x, move.to.y);
       board.enPassant = null;
@@ -27,7 +31,7 @@ public class BoardUtils {
       if (newPiece != null) {
         newPiece.placeAt(move.to.x, move.to.y);
         board.addView(newPiece);
-        board.nextTurn();
+        board.nextTurn(true);
       }
     }
   }

@@ -83,7 +83,9 @@ public class King extends Piece {
   public boolean canCastle4fen(boolean kingSide) {
     Board board = Board.getInstance();
     Piece rook = board.getPiece(new Pos(kingSide ? 0 : 7, pos.y));
-    return !this.isMoved() && rook instanceof Rook && !((Rook) rook).isMoved();
+    if (this.hasMoved) return false;
+    if (!(rook instanceof Rook)) return false;
+    return !((Rook) rook).isMoved();
   }
 
   private boolean canCastle(boolean kingSide) {

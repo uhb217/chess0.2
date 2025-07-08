@@ -20,6 +20,11 @@ import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.StockfishApi;
+
+import java.io.IOException;
+
+import kotlin.Unit;
 
 public class MainActivity extends AppCompatActivity {
   private Board board;
@@ -44,8 +49,12 @@ public class MainActivity extends AppCompatActivity {
 //    opponentPlayer = new Player("Opponent", 1600, Color.BLACK);
 
     rootLayout = findViewById(R.id.main);
-    board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));//TODO: move tests
-//    board = new Board(this, mainPlayer.getColor(),"UBtest");
+    String roomId = getIntent().getStringExtra("roomId");
+    if (roomId.length() == 6)
+      board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
+    else
+      board = new Board(this, mainPlayer.getColor(),Integer.parseInt(roomId));
+
     topPlayerInfoView = new PlayerInfoView(this, opponentPlayer);
     bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer);
 
@@ -56,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button btn = new Button(this);
     btn.setText("Play Move");
-    btn.setOnClickListener(view -> Log.d("Board", "fen: " + Board.getInstance().toFEN()));
+    btn.setOnClickListener(view -> Log.d("fen: ", board.toFEN()));
     rootLayout.addView(btn);
   }
 

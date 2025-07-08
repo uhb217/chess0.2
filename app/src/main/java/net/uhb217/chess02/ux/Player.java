@@ -29,12 +29,19 @@ public class Player implements Serializable {
     this.color = null;
 
   }
+  public static Player Stockfish(int depth) {
+    int rating;
+    if (depth <= 0) rating = 0;
 
-  public Player() {
-    this.username  = "Offline Player";
-    this.rating = 1600; // Default rating
-    this.color = Color.WHITE; // Default color
-    this.timeSeconds = 10 * 60; // Default time
+    if (depth <= 12) {
+      rating = 2350 - (12 - depth) * 100;
+    } else if (depth <= 20) {
+      double ratio = (depth - 12) / 8.0;
+      rating = (int) (2350 + ratio * (2850 - 2350));
+    } else {
+      rating = 2850 + (depth - 20) * 25;
+    }
+    return new Player("Stockfish", rating, Color.BLACK);
   }
 
   public String getTimeString() {
@@ -75,8 +82,9 @@ public class Player implements Serializable {
     void onPlayerFetched(Player player);
   }
 
-  public void setColor(Color color) {
+  public Player setColor(Color color) {
     this.color = color;
+    return this;
   }
 
     public Color getColor() {

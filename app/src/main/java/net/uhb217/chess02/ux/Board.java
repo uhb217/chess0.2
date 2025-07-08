@@ -3,9 +3,9 @@ package net.uhb217.chess02.ux;
 import static net.uhb217.chess02.ux.utils.Color.BLACK;
 import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -28,6 +28,7 @@ import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.Pos;
+import net.uhb217.chess02.ux.utils.StockfishApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +44,13 @@ public class Board extends FrameLayout {
   private int fullMoves = 1;
   public int halfMoves = 0; // Halfmove clock for fifty-move rule
   public final DatabaseReference db;
+  private final int depth;
 
   public Board(Context ctx, Color color, @NotNull String roomId) {
     super(ctx);
     this.db = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
     this.color = color;
+    this.depth = -1;
     int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
     LayoutParams params = new LayoutParams(screenWidth, screenWidth);
     params.gravity = Gravity.CENTER_HORIZONTAL;
@@ -57,6 +60,28 @@ public class Board extends FrameLayout {
     instance = this;
     initializeBoard();
     startListeningForOpponentMoves();//TODO: move tests
+  }
+
+  /**
+   * Constructor for creating a new board for playing against Stockfish.
+   *
+   * @param ctx
+   * @param color
+   * @param depth
+   */
+  public Board(Context ctx, Color color, int depth) {
+    super(ctx);
+    this.db = null;
+    this.color = color;
+    this.depth = depth;
+    int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
+    LayoutParams params = new LayoutParams(screenWidth, screenWidth);
+    params.gravity = Gravity.CENTER_HORIZONTAL;
+    setLayoutParams(params);
+
+    setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
+    instance = this;
+    initializeBoard();
   }
 
   private void initializeBoard() {
@@ -205,8 +230,7 @@ public class Board extends FrameLayout {
     return true;
   }
 
-  public void nextTurn() {
-    //TODO: check if the game is over(mates and stalemates)
+  public void nextTurn(boolean bySystem) {
     String gameOver = null;
     King opponentKing = getKing(color.opposite());
     if (opponentKing.isInCheck() && hasNoLegalMoves(color.opposite())) gameOver = "Checkmate";
@@ -228,6 +252,8 @@ public class Board extends FrameLayout {
         }
       });
     turnColor = turnColor.opposite();
+    if (depth != -1 && !bySystem)
+      StockfishApi.INSTANCE.playBestMove(toFEN(), depth);
   }
 
   public Color getTurnColor() {
@@ -235,9 +261,10 @@ public class Board extends FrameLayout {
   }
 
   public void sendMoveToFirebase(String move) {
-    if (db == null)
+    if (db == null && depth == -1)
       throw new IllegalStateException("Database reference is not initialized.");
-
+    else if (db == null)
+      return; // Ignore move if depth is not -1 (Playing against Stockfish)
     db.child("moves").get().addOnSuccessListener(dataSnapshot -> {
       if (dataSnapshot.exists()) {
         List<String> moves = new ArrayList<>();
@@ -282,7 +309,7 @@ public class Board extends FrameLayout {
             fen.append(spaceCount);
             spaceCount = 0;
           }
-          fen.append(piece.getColor() == WHITE? Character.toUpperCase(piece.charCode()): piece.charCode());
+          fen.append(piece.getColor() == WHITE ? Character.toUpperCase(piece.charCode()) : piece.charCode());
         }
       }
       if (spaceCount > 0) {
@@ -291,30 +318,36 @@ public class Board extends FrameLayout {
       }
       fen.append("/");
     }
+    fen.deleteCharAt(fen.length() - 1); // Remove last "/"
     fen.append(" ");
     fen.append(turnColor == WHITE ? "w" : "b");
     fen.append(" ");
     boolean someCastling = false;
-    if (getKing(WHITE).canCastle4fen(true)){
+    if (getKing(WHITE).canCastle4fen(true)) {
       fen.append("K");
       someCastling = true;
-    }if (getKing(WHITE).canCastle4fen(false)){
+    }
+    if (getKing(WHITE).canCastle4fen(false)) {
       fen.append("Q");
       someCastling = true;
-    }if (getKing(BLACK).canCastle4fen(true)){
+    }
+    if (getKing(BLACK).canCastle4fen(true)) {
       fen.append("k");
       someCastling = true;
-    }if (getKing(BLACK).canCastle4fen(false)){
+    }
+    if (getKing(BLACK).canCastle4fen(false)) {
       fen.append("q");
       someCastling = true;
-    }if (!someCastling) fen.append('-');
-    fen.append(" ");
-    for (Piece pawn: getPieces(turnColor).stream().filter(piece -> piece instanceof Pawn).collect(Collectors.toList())){
-      if(((Pawn) pawn).hasEnPassantMove()) {
-        fen.append(BoardUtils.pos2Square(enPassant));
-        break;
-      }
     }
+    if (!someCastling) fen.append('-');
+    fen.append(" ");
+//    if (enPassant != null)//TODO: check if en passant is still valid
+//      for (Piece pawn : getPieces(turnColor).stream().filter(piece -> piece instanceof Pawn).collect(Collectors.toList())) {
+//        if (((Pawn) pawn).hasEnPassantMove()) {
+//          fen.append(BoardUtils.pos2Square(enPassant));
+//          break;
+//        }
+//      }
     if (fen.charAt(fen.length() - 1) == ' ') // If no en passant target square
       fen.append("-");
     fen.append(" ");

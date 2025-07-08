@@ -6,14 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -36,7 +31,7 @@ import java.util.Random;
 
 public class RoomActivity extends AppCompatActivity {
   Button createRoomButton, joinButton;
-  TextView playVSStockfish;
+  FrameLayout playVSStockfish;
   EditText roomIdInput;
   private boolean triggered = false;
 
@@ -94,8 +89,12 @@ public class RoomActivity extends AppCompatActivity {
         });
       }));
     });
-    LinearLayout bottomPlayerInfo = findViewById(R.id.bottomPlayerInfo);
-//    bottomPlayerInfo.setOnClickListener();
+    playVSStockfish = findViewById(R.id.play_vs_stockfish);
+    playVSStockfish.setOnClickListener(view -> {
+      Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
+          ,player -> startGameActivity("18", player.setColor(Color.WHITE)
+          ,Player.Stockfish(18)));
+    });
   }
 
   public void createUniqueRoom(Context context) {

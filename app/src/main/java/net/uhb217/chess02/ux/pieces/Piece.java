@@ -30,10 +30,10 @@ public abstract class Piece extends AppCompatImageView {
     setOnClickListener(this::onClick);
     setImageResource(resId());
   }
-
+  public abstract char charCode();
   protected abstract int resId();
 
-  public abstract List<Pos> getLegalMoves(Piece[][] board);
+  public abstract List<Pos> getLegalMoves(Piece[][] boardPos);
 
   public List<Pos> getLegalMoves() {
     Board board = Board.getInstance();
@@ -42,6 +42,17 @@ public abstract class Piece extends AppCompatImageView {
         getLegalMoves(board.getBoard()).stream()
             .filter(p -> !isPinnedToKing(p)).collect(Collectors.toList());
     return List.of();
+  }
+
+  /**
+   * Checks if the piece has any legal moves for stalemates and mates.
+   * Can`t use {@link #getLegalMoves()} because its returns only legal moves for the current player
+   * @return true if the piece has any legal moves, false otherwise
+   */
+  public boolean hasLegalMoves() {
+    Board board = Board.getInstance();
+    return this instanceof King ? !getLegalMoves(board.getBoard()).isEmpty()
+        : getLegalMoves(board.getBoard()).stream().anyMatch(p -> !isPinnedToKing(p));
   }
 
   public boolean isPinnedToKing(Pos newPos) {
@@ -80,13 +91,14 @@ public abstract class Piece extends AppCompatImageView {
     move(pos.x, pos.y);
   }
   public void  move(int x, int y){
-    move(x, y, true);
+    move(x, y, true);//TODO: move tests
+//    move(x, y, false);
   }
 
   /**
    * Moves the piece to the specified position and updates the board state.
-   * Pawn completely overrides this.
-   * In King and Rook its with extra logic for castling.
+   * {@link Pawn} completely overrides this.
+   * In {@link King} and {@link Rook} its with extra logic for castling.
    * @param x the target x-coordinate
    * @param y the target y-coordinate
    * @param bySystem whether to update the Firebase database with this move(recursion prevention)

@@ -17,12 +17,17 @@ public class Bishop extends Piece {
   }
 
   @Override
+  public char charCode() {
+    return 'b';
+  }
+
+  @Override
   protected int resId() {
     return color == Color.WHITE ? R.drawable.wb : R.drawable.bb;
   }
 
   @Override
-  public List<Pos> getLegalMoves(Piece[][] board) {
+  public List<Pos> getLegalMoves(Piece[][] boardPos) {
     List<Pos> legalMoves = new ArrayList<>();
     int[] directions = {-1, 1}; // Used for diagonal directions
 
@@ -33,7 +38,7 @@ public class Bishop extends Piece {
         int y = pos.y + dy;
 
         while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-          Piece piece = board[x][y];
+          Piece piece = boardPos[x][y];
           if (piece == null)
             // Empty square, valid move
             legalMoves.add(new Pos(x, y));

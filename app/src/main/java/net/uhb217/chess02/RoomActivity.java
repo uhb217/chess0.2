@@ -1,12 +1,19 @@
 package net.uhb217.chess02;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -29,9 +36,11 @@ import java.util.Random;
 
 public class RoomActivity extends AppCompatActivity {
   Button createRoomButton, joinButton;
+  TextView playVSStockfish;
   EditText roomIdInput;
   private boolean triggered = false;
 
+  @SuppressLint("ClickableViewAccessibility")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -85,8 +94,8 @@ public class RoomActivity extends AppCompatActivity {
         });
       }));
     });
-
-
+    LinearLayout bottomPlayerInfo = findViewById(R.id.bottomPlayerInfo);
+//    bottomPlayerInfo.setOnClickListener();
   }
 
   public void createUniqueRoom(Context context) {
@@ -155,4 +164,6 @@ public class RoomActivity extends AppCompatActivity {
     super.onDestroy();
     Dialogs.dismissWaitingDialog();
   }
+
+  // Helper method for color blending
 }

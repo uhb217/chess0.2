@@ -68,15 +68,13 @@ public class BoardUtils {
    * @return move in UCI format
    */
   public static String move2UCI(int fromX, int fromY, int toX, int toY) {
+    return pos2Square(new Pos(fromX, fromY)) + pos2Square(new Pos(toX, toY));
+  }
+  public static String pos2Square(Pos pos) {
     boolean white = Board.getInstance().getColor() == Color.WHITE;
-
-    char fromFile = white ? (char) (fromX + 'a') : (char) ('h' - fromX);
-    int fromRank = white ? 8 - fromY : fromY + 1;
-
-    char toFile = white ? (char) (toX + 'a') : (char) ('h' - toX);
-    int toRank = white ? 8 - toY : toY + 1;
-
-    return "" + fromFile + fromRank + toFile + toRank;
+    char file = white ? (char) (pos.x + 'a') : (char) ('h' - pos.x);
+    int rank = white ? 8 - pos.y : pos.y + 1;
+    return "" + file + rank;
   }
   public static Piece newPieceFromChar(char pieceChar, Context ctx, Pos pos, Color color){
     Piece newPiece = null;

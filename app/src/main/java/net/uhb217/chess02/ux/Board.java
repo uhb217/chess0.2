@@ -1,8 +1,11 @@
 package net.uhb217.chess02.ux;
 
+import static net.uhb217.chess02.ux.utils.Color.BLACK;
 import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -12,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.annotations.NotNull;
 
 import net.uhb217.chess02.R;
+import net.uhb217.chess02.RoomActivity;
 import net.uhb217.chess02.ux.pieces.Bishop;
 import net.uhb217.chess02.ux.pieces.King;
 import net.uhb217.chess02.ux.pieces.Knight;
@@ -21,11 +25,13 @@ import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.Pos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Board extends FrameLayout {
   private static Board instance;
@@ -34,9 +40,11 @@ public class Board extends FrameLayout {
   public Pos enPassant = null; // For en passant capture
   private Color color;
   private Color turnColor = WHITE; // Default turn color
+  private int fullMoves = 1;
+  public int halfMoves = 0; // Halfmove clock for fifty-move rule
   public final DatabaseReference db;
 
-  public Board(Context ctx, Color color,@NotNull String roomId) {
+  public Board(Context ctx, Color color, @NotNull String roomId) {
     super(ctx);
     this.db = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
     this.color = color;
@@ -48,7 +56,7 @@ public class Board extends FrameLayout {
     setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
     instance = this;
     initializeBoard();
-    startListeningForOpponentMoves();
+    startListeningForOpponentMoves();//TODO: move tests
   }
 
   private void initializeBoard() {
@@ -126,10 +134,6 @@ public class Board extends FrameLayout {
     return pieces;
   }
 
-  private boolean isStaleMate() {
-    return false;
-  }
-
   public Color getColor() {
     return this.color;
   }
@@ -155,30 +159,97 @@ public class Board extends FrameLayout {
     this.clickedPiece = clickedPiece;
   }
 
-  public void nextTurn() {
-    turnColor = turnColor.opposite();
-    //TODO: check if the game is over(mates and stalemates)
+  private boolean hasNoLegalMoves(Color color) {
+    List<Piece> pieces = getPieces(color);
+    for (Piece piece : pieces)
+      if (piece.hasLegalMoves())
+        return false;
+    return true;
+  }
 
+  private boolean isSufficientMaterial() {
+    int pawns = 0;
+    int knights = 0;
+    int bishops = 0;
+    int rooks = 0;
+    int queens = 0;
+    for (Color color : Color.values()) {
+      for (Piece[] row : board)
+        for (Piece piece : row)
+          if (piece != null && piece.getColor() == color)
+            switch (piece.getClass().getSimpleName()) {
+              case "Pawn":
+                pawns++;
+                break;
+              case "Knight":
+                knights++;
+                break;
+              case "Bishop":
+                bishops++;
+                break;
+              case "Rook":
+                rooks++;
+                break;
+              case "Queen":
+                queens++;
+                break;
+            }
+      if (!(pawns >= 1 || queens >= 1 || rooks >= 1 || knights >= 2 || bishops >= 2 || (bishops > 0 && knights > 0)))
+        return false;
+      pawns = 0;
+      knights = 0;
+      bishops = 0;
+      rooks = 0;
+      queens = 0;
+    }
+    return true;
+  }
+
+  public void nextTurn() {
+    //TODO: check if the game is over(mates and stalemates)
+    String gameOver = null;
+    King opponentKing = getKing(color.opposite());
+    if (opponentKing.isInCheck() && hasNoLegalMoves(color.opposite())) gameOver = "Checkmate";
+    else if (hasNoLegalMoves(color.opposite())) gameOver = "Stalemate";
+    else if (!isSufficientMaterial()) gameOver = "Draw";
+
+    if (gameOver != null)
+      Dialogs.showGameOverDialog(getContext(), gameOver, "", new Dialogs.GameOverCallback() {
+        @Override
+        public void onRematch() {
+
+        }
+
+        @Override
+        public void onExit() {
+          Intent intent = new Intent(getContext(), RoomActivity.class);
+          intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+          getContext().startActivity(intent);
+        }
+      });
+    turnColor = turnColor.opposite();
   }
 
   public Color getTurnColor() {
     return turnColor;
   }
-  public void sendMoveToFirebase(String move){
+
+  public void sendMoveToFirebase(String move) {
     if (db == null)
       throw new IllegalStateException("Database reference is not initialized.");
 
     db.child("moves").get().addOnSuccessListener(dataSnapshot -> {
-      if (dataSnapshot.exists()){
+      if (dataSnapshot.exists()) {
         List<String> moves = new ArrayList<>();
         for (DataSnapshot child : dataSnapshot.getChildren())
           moves.add(child.getValue(String.class));
         moves.add(move);
         db.child("moves").setValue(moves);
-      }else
+      } else
         db.child("moves").setValue(List.of(move));
     });
   }
+
   private void startListeningForOpponentMoves() {
     if (db == null)
       throw new IllegalStateException("Database reference is not initialized.");
@@ -195,5 +266,60 @@ public class Board extends FrameLayout {
         }
       }
     }));
+  }
+
+  public String toFEN() {
+    StringBuilder fen = new StringBuilder();
+    int spaceCount = 0;
+    //if color is white, start from top else from bottom
+    for (int y = (color == WHITE ? 0 : 7); (color == WHITE ? y < 8 : y >= 0); y += color.code) {
+      for (int x = 0; x < 8; x++) {
+        Piece piece = board[x][y];
+        if (piece == null)
+          spaceCount++;
+        else {
+          if (spaceCount > 0) {
+            fen.append(spaceCount);
+            spaceCount = 0;
+          }
+          fen.append(piece.getColor() == WHITE? Character.toUpperCase(piece.charCode()): piece.charCode());
+        }
+      }
+      if (spaceCount > 0) {
+        fen.append(spaceCount);
+        spaceCount = 0;
+      }
+      fen.append("/");
+    }
+    fen.append(" ");
+    fen.append(turnColor == WHITE ? "w" : "b");
+    fen.append(" ");
+    boolean someCastling = false;
+    if (getKing(WHITE).canCastle4fen(true)){
+      fen.append("K");
+      someCastling = true;
+    }if (getKing(WHITE).canCastle4fen(false)){
+      fen.append("Q");
+      someCastling = true;
+    }if (getKing(BLACK).canCastle4fen(true)){
+      fen.append("k");
+      someCastling = true;
+    }if (getKing(BLACK).canCastle4fen(false)){
+      fen.append("q");
+      someCastling = true;
+    }if (!someCastling) fen.append('-');
+    fen.append(" ");
+    for (Piece pawn: getPieces(turnColor).stream().filter(piece -> piece instanceof Pawn).collect(Collectors.toList())){
+      if(((Pawn) pawn).hasEnPassantMove()) {
+        fen.append(BoardUtils.pos2Square(enPassant));
+        break;
+      }
+    }
+    if (fen.charAt(fen.length() - 1) == ' ') // If no en passant target square
+      fen.append("-");
+    fen.append(" ");
+    fen.append(halfMoves).append(" ").append(fullMoves);
+
+    return String.valueOf(fen);
   }
 }

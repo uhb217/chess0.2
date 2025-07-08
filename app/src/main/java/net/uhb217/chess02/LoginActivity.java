@@ -54,8 +54,8 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(fakeEmail, pass)
             .addOnSuccessListener(authResult -> {
               waitingDialog.dismiss();
-              startActivity(new Intent(this, RoomActivity.class));
-//              startActivity(new Intent(this, MainActivity.class));//TODO: move tests
+              startActivity(new Intent(this, RoomActivity.class));//TODO: move tests
+//              startActivity(new Intent(this, MainActivity.class));
             })
             .addOnFailureListener(e -> {
               waitingDialog.dismiss();

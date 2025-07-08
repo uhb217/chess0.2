@@ -20,6 +20,11 @@ public class King extends Piece {
   }
 
   @Override
+  public char charCode() {
+    return 'k';
+  }
+
+  @Override
   protected int resId() {
     return color == Color.WHITE ? R.drawable.wk : R.drawable.bk;
   }
@@ -37,7 +42,7 @@ public class King extends Piece {
   }
 
   @Override
-  public List<Pos> getLegalMoves(Piece[][] board) {
+  public List<Pos> getLegalMoves(Piece[][] boardPos) {
     List<Pos> legalMoves = new ArrayList<>();
     int[] directions = {-1, 0, 1};
 
@@ -51,7 +56,7 @@ public class King extends Piece {
         // Check if the move is within bounds
         if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
           Pos target = new Pos(x, y);
-          Piece piece = board[target.x][target.y];
+          Piece piece = boardPos[target.x][target.y];
 
           // Add the move if the target square is empty or occupied by an opponent piece
           if (piece == null || piece.color != this.color) {
@@ -69,6 +74,16 @@ public class King extends Piece {
 
 
     return legalMoves;
+  }
+  /**
+   * Same as {@link #canCastle(boolean)} but ignores the pieces in the way of the king and rook for the fen.
+   * @param kingSide true for king-side castling, false for queen-side castling
+   * @return true if castling is possible, false otherwise
+   */
+  public boolean canCastle4fen(boolean kingSide) {
+    Board board = Board.getInstance();
+    Piece rook = board.getPiece(new Pos(kingSide ? 0 : 7, pos.y));
+    return !this.isMoved() && rook instanceof Rook && !((Rook) rook).isMoved();
   }
 
   private boolean canCastle(boolean kingSide) {
@@ -117,5 +132,9 @@ public class King extends Piece {
 
   public boolean isInCheck(Piece[][] board) {
     return isInCheck(board, this.pos);
+  }
+
+  public boolean isMoved() {
+    return hasMoved;
   }
 }

@@ -17,12 +17,17 @@ public class Queen extends Piece {
   }
 
   @Override
+  public char charCode() {
+    return 'q';
+  }
+
+  @Override
   protected int resId() {
     return color == Color.WHITE ? R.drawable.wq : R.drawable.bq;
   }
 
   @Override
-  public List<Pos> getLegalMoves(Piece[][] board) {
+  public List<Pos> getLegalMoves(Piece[][] boardPos) {
     List<Pos> legalMoves = new ArrayList<>();
     int[] directions = {-1, 0, 1}; // Directions for horizontal, vertical, and diagonal movement
 
@@ -37,7 +42,7 @@ public class Queen extends Piece {
 
         // Move in the given direction until blocked
         while (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-          Piece piece = board[x][y];
+          Piece piece = boardPos[x][y];
           if (piece == null)
             legalMoves.add(new Pos(x, y)); // Empty square, valid move
           else {

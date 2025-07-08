@@ -18,7 +18,7 @@
         android:gravity="center_vertical"
         android:padding="12dp"
         android:background="@drawable/player_info_bg"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp">
@@ -124,12 +124,43 @@
             android:padding="8dp"/>
     </LinearLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_lottie_bg"
+        android:clipToOutline="true">
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/stockfish_gradient_lottie"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            app:lottie_fileName="moving_gradient.json"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true" />
+        <TextView
+            android:id="@+id/play_vs_stockfish"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Play VS Stockfish"
+            android:textAlignment="center"
+            android:background="#00000000"
+            android:textSize="30sp"
+            android:textColor="#FFF"
+            android:gravity="center"/>
+    </FrameLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        >
         <EditText
             android:id="@+id/room_code_edit"
             android:layout_width="0dp"
@@ -161,5 +192,10 @@
         android:backgroundTint="@color/primaryColor"
         android:text="create room"
         android:textSize="20sp"
-        android:layout_margin="16dp"/>
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+
 </LinearLayout>

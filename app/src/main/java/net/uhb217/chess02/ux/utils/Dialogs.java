@@ -3,6 +3,7 @@ package net.uhb217.chess02.ux.utils;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
@@ -105,6 +106,8 @@ public class Dialogs {
 
     TextView roomIdText = view.findViewById(R.id.roomIdText);
     roomIdText.setText("Room ID: " + roomId);
+    roomIdText.setFocusable(false);
+    roomIdText.setFocusableInTouchMode(false);
 
     waitingDialog = builder.create();
     waitingDialog.show();

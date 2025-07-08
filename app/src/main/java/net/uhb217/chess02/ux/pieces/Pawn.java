@@ -16,10 +16,16 @@ import java.util.List;
 
 public class Pawn extends Piece {
   private final int d;
+  private boolean hasEnPassantMove = false;
 
   public Pawn(@NonNull Context ctx, Pos pos, Color color) {
     super(ctx, pos, color);
     this.d = -color.code * Board.getInstance().getColor().code;//direction
+  }
+
+  @Override
+  public char charCode() {
+    return 'p';
   }
 
   @Override
@@ -60,24 +66,28 @@ public class Pawn extends Piece {
   }
 
   @Override
-  public List<Pos> getLegalMoves(Piece[][] board) {
+  public List<Pos> getLegalMoves(Piece[][] boardPos) {
     Color boardColor = Board.getInstance().getColor();
     List<Pos> legalMoves = new ArrayList<>();
 
-    if (board[pos.x][pos.y + d] == null)
+    if (boardPos[pos.x][pos.y + d] == null)
       legalMoves.add(new Pos(pos.x, pos.y + d));
-    if (pos.y == (color == boardColor ? 6 : 1) && board[pos.x][pos.y + 2 * d] == null)
+    if (pos.y == (color == boardColor ? 6 : 1) && boardPos[pos.x][pos.y + 2 * d] == null)
       legalMoves.add(new Pos(pos.x, pos.y + 2 * d));
-    if (getCaptureMoves(board) != null)
-      legalMoves.addAll(getCaptureMoves(board));
+    if (getCaptureMoves(boardPos) != null)
+      legalMoves.addAll(getCaptureMoves(boardPos));
 
     // En passant capture(not implemented in getCaptureMoves because its not effects the king moves)
     Pos enPassant = Board.getInstance().enPassant;
     if (enPassant != null) {
-      if (pos.x < 7 && enPassant.equals(pos.x + 1, pos.y + d))
+      if (pos.x < 7 && enPassant.equals(pos.x + 1, pos.y + d)) {
         legalMoves.add(new Pos(pos.x + 1, pos.y + d));
-      if (pos.x > 0 && enPassant.equals(pos.x - 1, pos.y + d))
+        hasEnPassantMove = true;
+      }
+      if (pos.x > 0 && enPassant.equals(pos.x - 1, pos.y + d)) {
         legalMoves.add(new Pos(pos.x - 1, pos.y + d));
+        hasEnPassantMove = true;
+      }
     }
     return legalMoves;
   }
@@ -93,5 +103,7 @@ public class Pawn extends Piece {
     return captureMoves;
   }
 
-
+  public boolean hasEnPassantMove() {
+    return hasEnPassantMove;
+  }
 }

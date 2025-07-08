@@ -2,6 +2,7 @@ package net.uhb217.chess02;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.BoardUtils;
+import net.uhb217.chess02.ux.utils.Color;
 
 public class MainActivity extends AppCompatActivity {
   private Board board;
@@ -42,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
 //    opponentPlayer = new Player("Opponent", 1600, Color.BLACK);
 
     rootLayout = findViewById(R.id.main);
-    board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
+    board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));//TODO: move tests
+//    board = new Board(this, mainPlayer.getColor(),"UBtest");
     topPlayerInfoView = new PlayerInfoView(this, opponentPlayer);
     bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer);
 
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button btn = new Button(this);
     btn.setText("Play Move");
-    btn.setOnClickListener(view -> startActivity(new Intent(this, RoomActivity.class)));
+    btn.setOnClickListener(view -> Log.d("Board", "fen: " + Board.getInstance().toFEN()));
     rootLayout.addView(btn);
   }
 

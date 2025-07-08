@@ -19,6 +19,11 @@ public class Rook extends Piece {
   }
 
   @Override
+  public char charCode() {
+    return 'r';
+  }
+
+  @Override
   protected int resId() {
     return color == Color.WHITE ? R.drawable.wr : R.drawable.br;
   }
@@ -30,14 +35,14 @@ public class Rook extends Piece {
   }
 
   @Override
-  public List<Pos> getLegalMoves(Piece[][] board) {
+  public List<Pos> getLegalMoves(Piece[][] boardPos) {
     List<Pos> legalMoves = new ArrayList<>();
     int[] directions = {-1, 1};// Horizontal and vertical directions
     for (int d : directions) {
       // Move horizontally (left and right)
       int x = pos.x + d;
       while (x >= 0 && x <= 7) {
-        Piece piece = board[x][pos.y];
+        Piece piece = boardPos[x][pos.y];
         if (piece == null)
           legalMoves.add(new Pos(x, pos.y));
         else {
@@ -50,7 +55,7 @@ public class Rook extends Piece {
       // Move vertically (up and down)
       int y = pos.y + d;
       while (y >= 0 && y <= 7) {
-        Piece piece = board[pos.x][y];
+        Piece piece = boardPos[pos.x][y];
         if (piece == null)
           legalMoves.add(new Pos(pos.x, y));
         else {

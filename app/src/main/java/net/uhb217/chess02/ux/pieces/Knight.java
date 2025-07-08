@@ -17,12 +17,17 @@ public class Knight extends Piece {
   }
 
   @Override
+  public char charCode() {
+    return 'n';
+  }
+
+  @Override
   protected int resId() {
     return color == Color.WHITE ? R.drawable.wn : R.drawable.bn;
   }
 
   @Override
-  public List<Pos> getLegalMoves(Piece[][] board) {
+  public List<Pos> getLegalMoves(Piece[][] boardPos) {
     List<Pos> legalMoves = new ArrayList<>();
 
     // All possible L-shaped moves for a knight
@@ -37,7 +42,7 @@ public class Knight extends Piece {
 
       // Check if the move is within board boundaries
       if (x >= 0 && x <= 7 && y >= 0 && y <= 7) {
-        Piece piece = board[x][y];
+        Piece piece = boardPos[x][y];
         // Add the move if the square is empty or occupied by an opponent's piece
         if (piece == null || piece.color != this.color)
           legalMoves.add(new Pos(x, y));

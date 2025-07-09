@@ -29,8 +29,8 @@ public class Rook extends Piece {
   }
 
   @Override
-  public void move(int x, int y) {
-    super.move(x, y);
+  public void move(int x, int y, boolean bySystem) {
+    super.move(x, y, bySystem);
     this.hasMoved = true; // Mark the rook as moved when it is moved
   }
 

@@ -322,24 +322,15 @@ public class Board extends FrameLayout {
     fen.append(" ");
     fen.append(turnColor == WHITE ? "w" : "b");
     fen.append(" ");
-    boolean someCastling = false;
-    if (getKing(WHITE).canCastle4fen(true)) {
-      fen.append("K");
-      someCastling = true;
+    for (Color kingColor : Color.values()) {
+      King king = getKing(kingColor);
+      if (king != null && king.canCastle4fen(true))
+        fen.append(kingColor == WHITE ? "K" : "k");
+      if (king != null && king.canCastle4fen(false))
+        fen.append(kingColor == WHITE ? "Q" : "q");
     }
-    if (getKing(WHITE).canCastle4fen(false)) {
-      fen.append("Q");
-      someCastling = true;
-    }
-    if (getKing(BLACK).canCastle4fen(true)) {
-      fen.append("k");
-      someCastling = true;
-    }
-    if (getKing(BLACK).canCastle4fen(false)) {
-      fen.append("q");
-      someCastling = true;
-    }
-    if (!someCastling) fen.append('-');
+    if (fen.charAt(fen.length() - 1) == ' ')
+      fen.append("-");
     fen.append(" ");
 //    if (enPassant != null)//TODO: check if en passant is still valid
 //      for (Piece pawn : getPieces(turnColor).stream().filter(piece -> piece instanceof Pawn).collect(Collectors.toList())) {

@@ -9,10 +9,6 @@ import net.uhb217.chess02.ux.pieces.Piece;
 import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
 
-import org.jetbrains.annotations.NotNull;
-
-import kotlin.Unit;
-
 public class BoardUtils {
   public static void playMove(Move move){
     Board board = Board.getInstance();

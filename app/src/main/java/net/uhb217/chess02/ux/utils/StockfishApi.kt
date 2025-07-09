@@ -49,16 +49,16 @@ object StockfishApi {
                     Log.d("Stockfish", "Response: $json")
 
                     // Check if the required fields exist
-                    if (!json.has("from") || !json.has("to")) {
-                        Log.e("Stockfish", "Missing required fields in response: $json")
+                    if (!json.has("move")) {
+                        Log.e("Stockfish", "Missing required fields in response: $json \n" +
+                                "fen: $fen")
                         return
                     }
 
-                    val from = json.getString("from")
-                    val to = json.getString("to")
+                    val bestMove = json.getString("move")
 
                     Handler(Looper.getMainLooper()).post {
-                        BoardUtils.playMove(BoardUtils.UCI2Move(from + to))
+                        BoardUtils.playMove(BoardUtils.UCI2Move(bestMove))
                     }
                 }
             }

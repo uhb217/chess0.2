@@ -30,13 +30,13 @@ public class King extends Piece {
   }
 
   @Override
-  public void move(int x, int y) {
+  public void move(int x, int y, boolean bySystem) {
     int d = Board.getInstance().getColor() == Color.WHITE ? 1 : -1;
     if (pos.x + 2 * d == x)//kingSide castle
       Board.getInstance().getPiece(new Pos(pos.x + 3 * d, y)).placeAt(x - d, y); // Move the rook during castling
     else if (pos.x - 2 * d == x)//queenSide castle
       Board.getInstance().getPiece(new Pos(pos.x - 4 * d, y)).placeAt(x + d, y); // Move the rook during castling
-    super.move(x, y);
+    super.move(x, y, bySystem);
     hasMoved = true; // Mark the king as moved when it is moved
 
   }
@@ -75,14 +75,16 @@ public class King extends Piece {
 
     return legalMoves;
   }
+
   /**
    * Same as {@link #canCastle(boolean)} but ignores the pieces in the way of the king and rook for the fen.
+   *
    * @param kingSide true for king-side castling, false for queen-side castling
    * @return true if castling is possible, false otherwise
    */
   public boolean canCastle4fen(boolean kingSide) {
     Board board = Board.getInstance();
-    Piece rook = board.getPiece(new Pos(kingSide ? 0 : 7, pos.y));
+    Piece rook = board.getPiece(new Pos((board.getColor() == Color.WHITE ? kingSide ? 7 : 0 : kingSide ? 0 : 7), pos.y));
     if (this.hasMoved) return false;
     if (!(rook instanceof Rook)) return false;
     return !((Rook) rook).isMoved();
@@ -90,8 +92,8 @@ public class King extends Piece {
 
   private boolean canCastle(boolean kingSide) {
     Board board = Board.getInstance();
-    int d = (kingSide ? 1 : -1) * (Board.getInstance().getColor() == Color.WHITE ? 1 : -1);
-    Piece rook = board.getPiece(new Pos(kingSide ? 0 : 7, pos.y));
+    int d = (kingSide ? 1 : -1) * (board.getColor() == Color.WHITE ? 1 : -1);
+    Piece rook = board.getPiece(new Pos((board.getColor() == Color.WHITE ? kingSide ? 7 : 0 : kingSide ? 0 : 7), pos.y));
     if (hasMoved) return false; // Cannot castle if the king has moved
     if (rook instanceof Rook) {
       if (((Rook) rook).isMoved()) return false; // Cannot castle if the rook has moved
@@ -121,14 +123,15 @@ public class King extends Piece {
   }
 
   private boolean isInCheck(Piece[][] board, Pos newKingPos) {
-    for (Piece enemyPiece : Board.getInstance().getPieces(color.opposite())) {
-      if (enemyPiece instanceof King)
-        continue;// Skip checking against enemy king because it will create a loop
-      if (enemyPiece instanceof Pawn && Pos.contains(((Pawn) enemyPiece).getCaptureMoves(board), newKingPos))
-        return true; // King is in check by an enemy pawn
-      else if (Pos.contains(enemyPiece.getLegalMoves(board), newKingPos))
-        return true; // King is in check by an enemy piece
-    }
+    for (Piece[] pieceRow : board)
+      for (Piece enemyPiece : pieceRow) {
+        if (enemyPiece == null || enemyPiece.color == this.color || enemyPiece instanceof King)
+          continue;
+        if (enemyPiece instanceof Pawn && Pos.contains(((Pawn) enemyPiece).getCaptureMoves(board), newKingPos))
+          return true; // King is in check by an enemy pawn
+        else if (Pos.contains(enemyPiece.getLegalMoves(board), newKingPos))
+          return true; // King is in check by an enemy piece
+      }
     return false; // King is not in check
   }
 

@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
+import net.uhb217.chess02.ux.utils.MoveHistory;
 import net.uhb217.chess02.ux.utils.Point;
 import net.uhb217.chess02.ux.utils.Pos;
 
@@ -107,6 +108,7 @@ public abstract class Piece extends AppCompatImageView {
     Board board = Board.getInstance();
     if (!bySystem)
       board.sendMoveToFirebase(BoardUtils.move2UCI(pos.x, pos.y, x, y));
+    MoveHistory.INSTANCE.push(board.toEFEN());
     placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);

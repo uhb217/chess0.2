@@ -52,7 +52,7 @@ public class SignupActivity extends AppCompatActivity {
         username.setError("Username cannot be empty");
         password.setError("Password cannot be empty");
       } else {
-        Dialog waitingDialog = Dialogs.signupWaitingDialog(this);
+        Dialog waitingDialog = Dialogs.INSTANCE.signupWaitingDialog(this);
         waitingDialog.show();
         String fakeEmail = user.toLowerCase() + "@chess.app.com";
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(fakeEmail, pass)

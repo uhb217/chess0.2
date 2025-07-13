@@ -3,9 +3,8 @@ package net.uhb217.chess02.ux;
 import static net.uhb217.chess02.ux.utils.Color.BLACK;
 import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -15,7 +14,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.annotations.NotNull;
 
 import net.uhb217.chess02.R;
-import net.uhb217.chess02.RoomActivity;
 import net.uhb217.chess02.ux.pieces.Bishop;
 import net.uhb217.chess02.ux.pieces.King;
 import net.uhb217.chess02.ux.pieces.Knight;
@@ -32,7 +30,6 @@ import net.uhb217.chess02.ux.utils.StockfishApi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Board extends FrameLayout {
   private static Board instance;
@@ -59,7 +56,7 @@ public class Board extends FrameLayout {
     setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
     instance = this;
     initializeBoard();
-    startListeningForOpponentMoves();//TODO: move tests
+    startListeningForOpponentMoves();
   }
 
   /**
@@ -232,27 +229,15 @@ public class Board extends FrameLayout {
 
   public void nextTurn(boolean bySystem) {
     String gameOver = null;
-    King opponentKing = getKing(color.opposite());
-    if (opponentKing.isInCheck() && hasNoLegalMoves(color.opposite())) gameOver = "Checkmate";
-    else if (hasNoLegalMoves(color.opposite())) gameOver = "Stalemate";
+    King opponentKing = getKing(turnColor.opposite());
+    if (opponentKing.isInCheck() && hasNoLegalMoves(turnColor.opposite())) gameOver = "Checkmate";
+    else if (hasNoLegalMoves(turnColor.opposite())) gameOver = "Stalemate";
     else if (!isSufficientMaterial()) gameOver = "Draw";
 
     if (gameOver != null)
-      Dialogs.showGameOverDialog(getContext(), gameOver, "", new Dialogs.GameOverCallback() {
-        @Override
-        public void onRematch() {
-
-        }
-
-        @Override
-        public void onExit() {
-          Intent intent = new Intent(getContext(), RoomActivity.class);
-          intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-          getContext().startActivity(intent);
-        }
-      });
+      Dialogs.INSTANCE.showGameOverDialog(getContext(), turnColor, gameOver);
     turnColor = turnColor.opposite();
-    if (depth != -1 && !bySystem)
+    if (depth != -1 && !bySystem && gameOver == null)
       StockfishApi.INSTANCE.playBestMove(toFEN(), depth);
   }
 
@@ -346,4 +331,92 @@ public class Board extends FrameLayout {
 
     return String.valueOf(fen);
   }
+
+  public String toEFEN() {
+    King whiteKing = getKing(WHITE);
+    King blackKing = getKing(BLACK);
+    if (whiteKing == null || blackKing == null)
+      return toFEN();
+    return toFEN() + " " + whiteKing.isMoved() + " " + blackKing.isMoved();
+  }
+
+  public void fromEFEN(String fen) {
+    clearBoard();
+
+    String[] efenParts = fen.split(" ");
+    String piecePlacement = efenParts[0];
+    String[] rows = piecePlacement.split("/");
+
+    // Based on the board's color (WHITE/BLACK), we need to adjust how we read the FEN
+    int startY = (color == WHITE) ? 0 : 7;
+    int increment = color.code; // Using the color's code value for increment
+
+    int y = startY;
+    for (String row : rows) {
+      int x = 0;
+      for (int i = 0; i < row.length() && x < 8; i++) {
+        char c = row.charAt(i);
+        if (Character.isDigit(c)) {
+          x += Character.getNumericValue(c);
+        } else {
+          Color pieceColor = Character.isUpperCase(c) ? WHITE : BLACK;
+          Piece piece = null;
+          Pos pos = new Pos(x, y);
+
+          switch (Character.toLowerCase(c)) {
+            case 'p':
+              piece = new Pawn(getContext(), pos, pieceColor);
+              break;
+            case 'r':
+              piece = new Rook(getContext(), pos, pieceColor);
+              break;
+            case 'n':
+              piece = new Knight(getContext(), pos, pieceColor);
+              break;
+            case 'b':
+              piece = new Bishop(getContext(), pos, pieceColor);
+              break;
+            case 'q':
+              piece = new Queen(getContext(), pos, pieceColor);
+              break;
+            case 'k':
+              piece = new King(getContext(), pos, pieceColor);
+              break;
+          }
+
+          if (piece != null) {
+            board[x][y] = piece;
+            addView(piece);
+            x++;
+          }
+        }
+      }
+      y += increment;
+    }
+
+    // Set turn color
+    if (efenParts.length > 1) {
+      turnColor = efenParts[1].equals("w") ? WHITE : BLACK;
+    }
+
+    // Handle castling rights if present
+
+    King whiteKing = getKing(WHITE);
+    if (whiteKing != null) whiteKing.setHasMoved(Boolean.parseBoolean(efenParts[efenParts.length - 2]));
+    King blackKing = getKing(BLACK);
+    if (blackKing != null) blackKing.setHasMoved(Boolean.parseBoolean(efenParts[efenParts.length - 1]));
+
+
+  }
+
+  private void clearBoard() {
+    // Remove all pieces from the board
+    for (int rank = 0; rank < 8; rank++)
+      for (int file = 0; file < 8; file++) {
+        if (board[file][rank] != null)
+          this.removeView(board[file][rank]);
+        board[file][rank] = null;
+      }
+  }
+
 }

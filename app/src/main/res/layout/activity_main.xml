@@ -1,13 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:id="@+id/board_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-</LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/go_back_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Go Back to Rooms"
+            android:backgroundTint="@color/primaryColor"
+            android:visibility="invisible"/>
+
+        <LinearLayout
+            android:id="@+id/game_controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:orientation="horizontal"
+            android:background="@drawable/player_info_bg"
+            android:padding="16dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/back_btn"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/ripple_effect"
+                android:background="@drawable/player_info_bg"
+                android:src="@drawable/arrow_back_24" />
+
+            <ImageView
+                android:id="@+id/forward_btn"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/ripple_effect"
+                android:background="@drawable/player_info_bg"
+                android:src="@drawable/baseline_arrow_forward_24" />
+
+            <ImageView
+                android:id="@+id/resign_btn"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/ripple_effect"
+                android:background="@drawable/player_info_bg"
+                android:src="@drawable/round_flag_circle_24" />
+
+            <ImageView
+                android:id="@+id/draw_btn"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/ripple_effect"
+                android:background="@drawable/player_info_bg"
+                android:src="@drawable/baseline_handshake_24" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

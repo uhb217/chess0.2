@@ -142,4 +142,8 @@ public class King extends Piece {
   public boolean isMoved() {
     return hasMoved;
   }
+
+  public void setHasMoved(boolean hasMoved) {
+    this.hasMoved = hasMoved;
+  }
 }

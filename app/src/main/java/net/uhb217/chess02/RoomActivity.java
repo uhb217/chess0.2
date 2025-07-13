@@ -26,6 +26,7 @@ import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
+import net.uhb217.chess02.ux.utils.StockfishApi;
 
 import java.util.Random;
 
@@ -92,8 +93,8 @@ public class RoomActivity extends AppCompatActivity {
     playVSStockfish = findViewById(R.id.play_vs_stockfish);
     playVSStockfish.setOnClickListener(view -> {
       Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
-          ,player -> startGameActivity("18", player.setColor(Color.WHITE)
-          ,Player.Stockfish(18)));
+          ,player -> startGameActivity("15", player.setColor(Color.WHITE)
+          ,Player.Stockfish(15)));
     });
   }
 
@@ -114,7 +115,7 @@ public class RoomActivity extends AppCompatActivity {
       if (snapshot.exists())// Retry if room already exists
         tryGenerateRoom(context, attempts + 1);
       else {
-        Dialog waitingDialog = Dialogs.showWaitingDialog(context, roomId, roomRef::removeValue);
+        Dialog waitingDialog = Dialogs.INSTANCE.showWaitingDialog(context, roomId, roomRef::removeValue);
         // Room is safe to create
         Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
           if (player != null) {
@@ -130,7 +131,7 @@ public class RoomActivity extends AppCompatActivity {
             }));
           } else {
             Log.e("Player", "Failed to fetch player data");
-            Dialogs.dismissWaitingDialog();
+            Dialogs.INSTANCE.dismissWaitingDialog();
           }
         });
       }
@@ -161,7 +162,7 @@ public class RoomActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    Dialogs.dismissWaitingDialog();
+    Dialogs.INSTANCE.dismissWaitingDialog();
   }
 
   // Helper method for color blending

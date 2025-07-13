@@ -22,7 +22,7 @@
         android:id="@+id/textReason"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Checkmate"
+        android:text="by Checkmate"
         android:textSize="16sp"
         android:textColor="#CCCCCC"
         android:gravity="center"
@@ -32,7 +32,7 @@
         android:id="@+id/btnRematch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Rematch"
+        android:text="See Position"
         android:backgroundTint="#4CAF50"
         android:textColor="#FFFFFF"
         android:layout_marginBottom="12dp" />

@@ -9,6 +9,7 @@ import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ux.utils.MoveHistory;
 import net.uhb217.chess02.ux.utils.Pos;
 
 import java.util.ArrayList;
@@ -49,19 +50,21 @@ public class Pawn extends Piece {
     if (lastY + 2 * d == y)
       board.enPassant = new Pos(x, lastY + d); // Set en passant target square
     if (y == (color == Board.getInstance().getColor() ? 0 : 7)) {//premotion
-      Dialogs.showPromotionDialog(getContext(), color, pieceChar -> {
+      Dialogs.INSTANCE.showPromotionDialog(getContext(), color, pieceChar -> {
         Piece newPiece = BoardUtils.newPieceFromChar(pieceChar, getContext(), new Pos(x, y), color);
         if (newPiece != null) {
           if (!bySystem) board.sendMoveToFirebase(BoardUtils.move2UCI(lastX,lastY,x, y) + pieceChar);
           newPiece.placeAt(x, y);
           board.addView(newPiece);
+          MoveHistory.INSTANCE.push(BoardUtils.move2UCI(pos.x, pos.y, x, y));
           board.nextTurn(bySystem);
         }
       });
     } else {
-      board.nextTurn(bySystem);
       if (!bySystem)
         board.sendMoveToFirebase(BoardUtils.move2UCI(lastX, lastY, x, y));
+      MoveHistory.INSTANCE.push(BoardUtils.move2UCI(pos.x, pos.y, x, y));
+      board.nextTurn(bySystem);
     }
   }
 

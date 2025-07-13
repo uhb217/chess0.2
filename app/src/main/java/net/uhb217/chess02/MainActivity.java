@@ -1,10 +1,8 @@
 package net.uhb217.chess02;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
@@ -18,13 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
-import net.uhb217.chess02.ux.utils.BoardUtils;
-import net.uhb217.chess02.ux.utils.Color;
-import net.uhb217.chess02.ux.utils.StockfishApi;
-
-import java.io.IOException;
-
-import kotlin.Unit;
+import net.uhb217.chess02.ux.utils.MoveHistory;
 
 public class MainActivity extends AppCompatActivity {
   private Board board;
@@ -44,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
     });
 
     mainPlayer = (Player) getIntent().getSerializableExtra("mainPlayer");
-    opponentPlayer = (Player) getIntent().getSerializableExtra("opponentPlayer");//TODO: move tests
+    opponentPlayer = (Player) getIntent().getSerializableExtra("opponentPlayer");
 //    mainPlayer = new Player("uhb217", 1600, Color.BLACK);
 //    opponentPlayer = new Player("Opponent", 1600, Color.BLACK);
 
-    rootLayout = findViewById(R.id.main);
+    rootLayout = findViewById(R.id.board_container);
     String roomId = getIntent().getStringExtra("roomId");
     if (roomId.length() == 6)
       board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
@@ -62,13 +54,22 @@ public class MainActivity extends AppCompatActivity {
     rootLayout.addView(board);
     rootLayout.addView(bottomPlayerInfoView);
 
+    bottomGameControlsSetup();
+
 
     Button btn = new Button(this);
     btn.setText("Play Move");
     btn.setOnClickListener(view -> Log.d("fen: ", board.toFEN()));
     rootLayout.addView(btn);
-  }
 
+  }
+  private void bottomGameControlsSetup(){
+    findViewById(R.id.back_btn).setOnClickListener(view -> Log.d("MainActivity", MoveHistory.INSTANCE.peek().getFen()));
+    findViewById(R.id.forward_btn).setOnClickListener(view -> Board.getInstance().fromEFEN("r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6 false false"));
+    findViewById(R.id.resign_btn).setOnClickListener(view -> {});
+    findViewById(R.id.draw_btn).setOnClickListener(view -> {});
+
+  }
   @Override
   protected void onDestroy() {
     super.onDestroy();

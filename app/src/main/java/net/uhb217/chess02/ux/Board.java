@@ -4,7 +4,6 @@ import static net.uhb217.chess02.ux.utils.Color.BLACK;
 import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
@@ -309,9 +308,9 @@ public class Board extends FrameLayout {
     fen.append(" ");
     for (Color kingColor : Color.values()) {
       King king = getKing(kingColor);
-      if (king != null && king.canCastle4fen(true))
+      if (king != null && king.isKingsideAvailable)
         fen.append(kingColor == WHITE ? "K" : "k");
-      if (king != null && king.canCastle4fen(false))
+      if (king != null && king.isQueensideAvailable)
         fen.append(kingColor == WHITE ? "Q" : "q");
     }
     if (fen.charAt(fen.length() - 1) == ' ')
@@ -332,20 +331,12 @@ public class Board extends FrameLayout {
     return String.valueOf(fen);
   }
 
-  public String toEFEN() {
-    King whiteKing = getKing(WHITE);
-    King blackKing = getKing(BLACK);
-    if (whiteKing == null || blackKing == null)
-      return toFEN();
-    return toFEN() + " " + whiteKing.isMoved() + " " + blackKing.isMoved();
-  }
-
-  public void fromEFEN(String fen) {
+  public void fromFEN(String fen) {
     clearBoard();
 
-    String[] efenParts = fen.split(" ");
-    String piecePlacement = efenParts[0];
-    String[] rows = piecePlacement.split("/");
+    String[] fenParts = fen.split(" ");
+    if (fenParts.length != 6) throw new IllegalArgumentException("Invalid FEN string.");
+    String[] rows = fenParts[0].split("/");
 
     // Based on the board's color (WHITE/BLACK), we need to adjust how we read the FEN
     int startY = (color == WHITE) ? 0 : 7;
@@ -395,17 +386,15 @@ public class Board extends FrameLayout {
     }
 
     // Set turn color
-    if (efenParts.length > 1) {
-      turnColor = efenParts[1].equals("w") ? WHITE : BLACK;
-    }
-
-    // Handle castling rights if present
-
+    turnColor = fenParts[1].equals("w") ? WHITE : BLACK;
+    // Handle castling rights if present. if both option to
     King whiteKing = getKing(WHITE);
-    if (whiteKing != null) whiteKing.setHasMoved(Boolean.parseBoolean(efenParts[efenParts.length - 2]));
     King blackKing = getKing(BLACK);
-    if (blackKing != null) blackKing.setHasMoved(Boolean.parseBoolean(efenParts[efenParts.length - 1]));
-
+    String castling = fenParts[2];
+    blackKing.isKingsideAvailable = castling.contains("K");
+    blackKing.isQueensideAvailable = castling.contains("Q");
+    whiteKing.isKingsideAvailable = castling.contains("k");
+    whiteKing.isQueensideAvailable = castling.contains("q");
 
   }
 

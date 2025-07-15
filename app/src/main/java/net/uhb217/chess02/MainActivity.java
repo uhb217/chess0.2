@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
   }
   private void bottomGameControlsSetup(){
     findViewById(R.id.back_btn).setOnClickListener(view -> Log.d("MainActivity", MoveHistory.INSTANCE.peek().getFen()));
-    findViewById(R.id.forward_btn).setOnClickListener(view -> Board.getInstance().fromEFEN("r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6 false false"));
+    findViewById(R.id.forward_btn).setOnClickListener(view -> Board.getInstance().fromFEN("r1bqkb1r/ppp2ppp/2n5/3np1N1/2B5/8/PPPP1PPP/RNBQK2R w KQkq - 0 6 false false"));
     findViewById(R.id.resign_btn).setOnClickListener(view -> {});
     findViewById(R.id.draw_btn).setOnClickListener(view -> {});
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import net.uhb217.chess02.R;
+import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Pos;
 
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Rook extends Piece {
-  private boolean hasMoved = false; // Track if the rook has moved for castling purposes
 
   public Rook(@NonNull Context ctx, Pos pos, Color color) {
     super(ctx, pos, color);
@@ -30,8 +30,14 @@ public class Rook extends Piece {
 
   @Override
   public void move(int x, int y, boolean bySystem) {
+    if (pos.y == (color == Board.getInstance().getColor() ? 7 : 0)){
+      if (pos.x == (color == Color.WHITE ? 7 : 0))
+          Board.getInstance().getKing(color).isKingsideAvailable = false;
+      else if (pos.x == (color == Color.WHITE ? 0 : 7))
+          Board.getInstance().getKing(color).isQueensideAvailable = false;
+    }
+
     super.move(x, y, bySystem);
-    this.hasMoved = true; // Mark the rook as moved when it is moved
   }
 
   @Override
@@ -70,11 +76,4 @@ public class Rook extends Piece {
     return legalMoves;
   }
 
-  public void setHasMoved(boolean hasMoved) {
-    this.hasMoved = hasMoved;
-  }
-
-  public boolean isMoved() {
-    return hasMoved;
-  }
 }

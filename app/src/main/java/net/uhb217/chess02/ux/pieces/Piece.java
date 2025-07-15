@@ -108,7 +108,7 @@ public abstract class Piece extends AppCompatImageView {
     Board board = Board.getInstance();
     if (!bySystem)
       board.sendMoveToFirebase(BoardUtils.move2UCI(pos.x, pos.y, x, y));
-    MoveHistory.INSTANCE.push(board.toEFEN());
+    MoveHistory.INSTANCE.push(board.toFEN());
     placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);

@@ -24,6 +24,7 @@ import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
+import net.uhb217.chess02.ux.utils.MoveHistory;
 import net.uhb217.chess02.ux.utils.Pos;
 import net.uhb217.chess02.ux.utils.StockfishApi;
 
@@ -45,16 +46,10 @@ public class Board extends FrameLayout {
   public Board(Context ctx, Color color, @NotNull String roomId) {
     super(ctx);
     this.db = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
-    this.color = color;
     this.depth = -1;
-    int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
-    LayoutParams params = new LayoutParams(screenWidth, screenWidth);
-    params.gravity = Gravity.CENTER_HORIZONTAL;
-    setLayoutParams(params);
 
-    setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
-    instance = this;
-    initializeBoard();
+    standardSetup(ctx, color);
+
     startListeningForOpponentMoves();
   }
 
@@ -68,8 +63,12 @@ public class Board extends FrameLayout {
   public Board(Context ctx, Color color, int depth) {
     super(ctx);
     this.db = null;
-    this.color = color;
     this.depth = depth;
+
+    standardSetup(ctx, color);
+  }
+  private void standardSetup(Context ctx, Color color) {
+    this.color = color;
     int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
     LayoutParams params = new LayoutParams(screenWidth, screenWidth);
     params.gravity = Gravity.CENTER_HORIZONTAL;
@@ -78,8 +77,8 @@ public class Board extends FrameLayout {
     setBackground(ctx.getDrawable(color == WHITE ? R.drawable.white_board : R.drawable.black_board));
     instance = this;
     initializeBoard();
+    MoveHistory.INSTANCE.push(toFEN());
   }
-
   private void initializeBoard() {
     board = new Piece[8][8];
     // Place pawns
@@ -335,7 +334,7 @@ public class Board extends FrameLayout {
     clearBoard();
 
     String[] fenParts = fen.split(" ");
-    if (fenParts.length != 6) throw new IllegalArgumentException("Invalid FEN string.");
+//    if (fenParts.length != 6) throw new IllegalArgumentException("Invalid FEN string.");
     String[] rows = fenParts[0].split("/");
 
     // Based on the board's color (WHITE/BLACK), we need to adjust how we read the FEN

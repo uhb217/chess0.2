@@ -8,31 +8,37 @@ import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 import java.net.URLEncoder
+import java.util.concurrent.TimeUnit
 
 
 object StockfishApi {
 
-    private val client = OkHttpClient()
-
-    //    private const val API_URL = "https://chess-api.com/v1"
-    private const val API_URL = "https://stockfish.online/api/s/v2.php"
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .writeTimeout(10, TimeUnit.SECONDS)
+        .build()
+    private const val API_URL = "https://stockfish-api-osfa.onrender.com/evaluate"
     private val JSON = "application/json; charset=utf-8".toMediaType()
-    fun playBestMove(fen: String, depth: Int) {
-        playBestMove(0, fen, depth)
-    }
 
-    fun playBestMove(count: Int, fen: String, depth: Int) {
-        if (count > 10) throw RuntimeException("Too many requests")
+    fun playBestMove(fen: String, depth: Int) {
         // Create the request
-        val encodedFEN = URLEncoder.encode(fen, "UTF-8")
-        val url = "$API_URL?fen=$encodedFEN&depth=$depth"
+        val jsonBody = """
+            {
+              "fen": "$fen",
+              "depth": $depth
+            }
+        """.trimIndent()
+        val requestBody = jsonBody.toRequestBody(JSON)
+
         val request = Request.Builder()
-            .url(url)
-            .get()
+            .url(API_URL)
+            .post(requestBody)
             .build()
 
         // Execute asynchronously
@@ -51,76 +57,18 @@ object StockfishApi {
                     // Log the response for debugging
                     Log.d("Stockfish", "Response: $json")
 
-                    // Check if the required fields exist
-                    if (!json.has("success")) {
+                    if (!json.has("bestmove")) {
                         Log.e(
                             "Stockfish", "Missing required fields in response: $json \n" +
                                     "fen: $fen"
                         )
                         return
                     }
-                    if (json.getString("success") != "true") {
-                        Log.e("Stockfish", "API call failed: $json \n" + "fen: $fen")
-                        playBestMove(count + 1, fen, depth)
-                        return
-                    }
-                    if (!json.has("bestmove")) {
-                        Log.e("Stockfish", "Missing required fields in response: $json \n" +
-                                "fen: $fen")
-                        return
-                    }
-                    val bestMove = json.getString("bestmove").substring(9, 14).trimEnd()
                     Handler(Looper.getMainLooper()).post {
-                        BoardUtils.playMove(BoardUtils.UCI2Move(bestMove))
+                        BoardUtils.playMove(BoardUtils.UCI2Move(json.getString("bestmove")))
                     }
                 }
             }
         })
     }
-
-//    fun playBestMove(fen: String, depth: Int) {
-//        val jsonBody = """
-//            {
-//              "fen": "$fen",
-//              "depth": $depth
-//            }
-//        """.trimIndent()
-//        val requestBody = jsonBody.toRequestBody(JSON)
-//
-//        val request = Request.Builder()
-//            .url(API_URL)
-//            .post(requestBody)
-//            .build()
-//
-//        client.newCall(request).enqueue(object : Callback {
-//            override fun onFailure(call: Call, e: IOException) {
-//                Log.d("Stockfish", e.message.toString())
-//            }
-//
-//            override fun onResponse(call: Call, response: Response) {
-//                response.use {
-//                    if (!it.isSuccessful) {
-//                        Log.e("Stockfish", "Unexpected code $it")
-//                        return
-//                    }
-//                    val json = JSONObject(it.body.string())
-//                    // Log the response for debugging
-//                    Log.d("Stockfish", "Response: $json")
-//
-//                    // Check if the required fields exist
-//                    if (!json.has("move")) {
-//                        Log.e("Stockfish", "Missing required fields in response: $json \n" +
-//                                "fen: $fen")
-//                        return
-//                    }
-//
-//                    val bestMove = json.getString("move")
-//
-//                    Handler(Looper.getMainLooper()).post {
-//                        BoardUtils.playMove(BoardUtils.UCI2Move(bestMove))
-//                    }
-//                }
-//            }
-//        })
-//    }
 }

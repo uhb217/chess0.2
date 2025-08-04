@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/app/src/main/res/drawable/rounded_draw_dialog.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/drawable/rounded_draw_dialog.xml" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    android:shape=&quot;rectangle&quot;&gt;&#10;    &lt;solid android:color=&quot;@color/draw_dialog_bg&quot; /&gt;&#10;    &lt;corners android:radius=&quot;20dp&quot; /&gt;&#10;    &lt;stroke android:width=&quot;2dp&quot; android:color=&quot;@color/draw_dialog_accent&quot; /&gt;&#10;&lt;/shape&gt;&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/res/layout/dialog_draw_offer_sent.xml">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/res/layout/dialog_draw_offer_sent.xml" />
+              <option name="originalContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;&#10;    android:layout_width=&quot;wrap_content&quot;&#10;    android:layout_height=&quot;wrap_content&quot;&#10;    android:orientation=&quot;vertical&quot;&#10;    android:padding=&quot;24dp&quot;&#10;    android:background=&quot;@drawable/rounded_bg&quot;&#10;    android:gravity=&quot;center&quot;&gt;&#10;    &lt;TextView&#10;        android:layout_width=&quot;wrap_content&quot;&#10;        android:layout_height=&quot;wrap_content&quot;&#10;        android:layout_marginBottom=&quot;12dp&quot;&#10;        android:textAlignment=&quot;center&quot;&#10;        android:text=&quot;Draw Offer has been sent&quot;&#10;        android:textSize=&quot;20sp&quot;&#10;        android:textColor=&quot;#1C1C1D&quot;&#10;        /&gt;&#10;    &lt;com.airbnb.lottie.LottieAnimationView&#10;        android:id=&quot;@+id/lottie_draw_offer_sent&quot;&#10;        android:layout_width=&quot;200dp&quot;&#10;        android:layout_height=&quot;200dp&quot;&#10;        app:lottie_autoPlay=&quot;true&quot;&#10;        app:lottie_loop=&quot;true&quot;&#10;        app:lottie_fileName=&quot;loading_sand_clock.json&quot; /&gt;&#10;&#10;&lt;/LinearLayout&gt;&#10;&#10;" />
+              <option name="updatedContent" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#10;&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;&#10;    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;&#10;    android:layout_width=&quot;wrap_content&quot;&#10;    android:layout_height=&quot;wrap_content&quot;&#10;    android:orientation=&quot;vertical&quot;&#10;    android:padding=&quot;24dp&quot;&#10;    android:background=&quot;@drawable/rounded_draw_dialog&quot;&#10;    android:gravity=&quot;center&quot;&gt;&#10;    &lt;TextView&#10;        android:layout_width=&quot;wrap_content&quot;&#10;        android:layout_height=&quot;wrap_content&quot;&#10;        android:layout_marginBottom=&quot;12dp&quot;&#10;        android:textAlignment=&quot;center&quot;&#10;        android:text=&quot;Draw Offer has been sent&quot;&#10;        android:textSize=&quot;20sp&quot;&#10;        android:textColor=&quot;@color/draw_dialog_text&quot;&#10;        /&gt;&#10;    &lt;com.airbnb.lottie.LottieAnimationView&#10;        android:id=&quot;@+id/lottie_draw_offer_sent&quot;&#10;        android:layout_width=&quot;200dp&quot;&#10;        android:layout_height=&quot;200dp&quot;&#10;        app:lottie_autoPlay=&quot;true&quot;&#10;        app:lottie_loop=&quot;true&quot;&#10;        app:lottie_fileName=&quot;loading_sand_clock.json&quot; /&gt;&#10;&#10;&lt;/LinearLayout&gt;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

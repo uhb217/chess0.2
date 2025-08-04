@@ -11,9 +11,9 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import com.google.firebase.database.DatabaseReference
 import net.uhb217.chess02.R
 import net.uhb217.chess02.RoomActivity
-import net.uhb217.chess02.ui.BottomGameControls
 import net.uhb217.chess02.ux.Board
 
 
@@ -63,10 +63,7 @@ object Dialogs {
         return ctx.resources.getIdentifier(name, "drawable", ctx.packageName)
     }
 
-    fun showGameOverDialog(ctx: Context, winner: Color, reason: String) {
-        Board.getInstance().isGameOver = true
-        BottomGameControls.disable(ctx as Activity)
-
+    fun showGameOverDialog(ctx: Context, winner: Color?, reason: String) {
         val dialog = Dialog(ctx)
         dialog.setContentView(R.layout.dialog_game_over)
         dialog.setCancelable(false)
@@ -80,8 +77,13 @@ object Dialogs {
         backBtn.visibility = View.VISIBLE
         backBtn.setOnClickListener { btnExit.performClick() }
 
-        resultText.text = "${winner.name} wins!"
-        reasonText.text = "by $reason"
+        if (winner == null) {
+            resultText.text = "Draw!"
+            reasonText.text = "by agriment"
+        } else {
+            resultText.text = "${winner.name} wins!"
+            reasonText.text = "by $reason"
+        }
 
         btnSeePosition.setOnClickListener { v: View -> dialog.dismiss() }
 
@@ -129,9 +131,7 @@ object Dialogs {
     }
 
     fun dismissWaitingDialog() {
-        if (waitingDialog != null && waitingDialog!!.isShowing) {
-            waitingDialog!!.dismiss()
-        }
+        if (waitingDialog != null && waitingDialog!!.isShowing) waitingDialog!!.dismiss()
     }
 
     fun loginWaitingDialog(ctx: Context): Dialog {
@@ -148,6 +148,35 @@ object Dialogs {
         statusText.text = "Creating account..."
         return dialog
     }
+
+    fun drawOfferDialog(ctx: Context, db: DatabaseReference){
+        val dialog = Dialog(ctx)
+        dialog.setContentView(R.layout.dialog_draw_offer)
+        dialog.setCancelable(false)
+
+        val btnAgree = dialog.findViewById<ImageButton>(R.id.btn_draw_agree)
+        val btnDisagree = dialog.findViewById<ImageButton>(R.id.btn_draw_disagree)
+
+        btnAgree.setOnClickListener {
+            db.child("draw").setValue(2)
+            dialog.dismiss()
+        }
+        btnDisagree.setOnClickListener {
+            db.child("draw").setValue(3)
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private var waitForDrawResponse: Dialog? = null
+    fun waitForDrawResponseDialog(ctx: Context){
+        waitForDrawResponse = Dialog(ctx)
+        waitForDrawResponse?.setContentView(R.layout.dialog_draw_offer_sent)
+        waitForDrawResponse?.setCancelable(false)
+        waitForDrawResponse?.show()
+    }
+    fun dismissWaitForDrawResponseDialog() = waitForDrawResponse?.dismiss()
+
 
     interface PromotionCallback {
         fun onPieceChosen(piece: Char)

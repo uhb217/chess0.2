@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2025-07-06T12:23:53.760586100Z">
+        <DropdownSelection timestamp="2025-08-04T14:49:49.803691500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\UHB21\.android\avd\Pixel_4.avd" />
@@ -15,7 +15,7 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="FirebaseDirectAccess" identifier="reservation=projects/chess02-0c3ddae5/deviceSessions/session-1qfz4c1eare1g" />
+                <DeviceId pluginId="FirebaseDirectAccess" identifier="reservation=projects/chess02-0c3ddae5/deviceSessions/session-354gggksjen5a" />
               </handle>
               <template>
                 <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=e1q/34" />

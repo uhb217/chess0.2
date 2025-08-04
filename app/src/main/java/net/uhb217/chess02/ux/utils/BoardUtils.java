@@ -1,6 +1,7 @@
 package net.uhb217.chess02.ux.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.pieces.Bishop;
@@ -12,6 +13,9 @@ import net.uhb217.chess02.ux.pieces.Rook;
 public class BoardUtils {
   public static void playMove(Move move){
     Board board = Board.getInstance();
+    while (MoveHistory.INSTANCE.canMoveForward())
+      board.fromFEN(MoveHistory.INSTANCE.moveForward());
+
     if (move == null || move.from == null || move.to == null)
       throw new IllegalArgumentException("Move or its positions cannot be null");
 

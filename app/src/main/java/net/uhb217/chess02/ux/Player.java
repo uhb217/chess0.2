@@ -81,6 +81,14 @@ public class Player implements Serializable {
     fromFirebaseUsername(user.getDisplayName(), callback);
   }
 
+  public void updateRating(int opponentRating, int gameStatus){
+    int toAdd = 16 * (gameStatus - (1 / (1 + 10 ^ (opponentRating - rating))));
+
+    int newRating = rating + toAdd;
+    FirebaseDatabase.getInstance().getReference("players").child(username)
+        .child("rating").setValue(newRating);
+  }
+
   public interface PlayerCallback {
     void onPlayerFetched(Player player);
   }

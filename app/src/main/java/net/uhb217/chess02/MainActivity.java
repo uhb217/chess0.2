@@ -43,21 +43,24 @@ public class MainActivity extends AppCompatActivity {
 
     rootLayout = findViewById(R.id.board_container);
     String roomId = getIntent().getStringExtra("roomId");
-    boolean againstStockfish = roomId.length() == 6;
+    boolean againstStockfish = roomId.length() != 6;
     if (againstStockfish)
-      board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
-    else
       board = new Board(this, mainPlayer.getColor(),Integer.parseInt(roomId));
+    else
+      board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
 
     topPlayerInfoView = new PlayerInfoView(this, opponentPlayer, againstStockfish);
     bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer, againstStockfish);
+
+    topPlayerInfoView.setId(R.id.top_player_info_view);
+    bottomPlayerInfoView.setId(R.id.bottom_player_info_view);
 
     rootLayout.addView(topPlayerInfoView);
     rootLayout.addView(board);
     rootLayout.addView(bottomPlayerInfoView);
 
 //    bottomGameControlsSetup();
-    BottomGameControls.INSTANCE.setup(this, againstStockfish);
+    BottomGameControls.INSTANCE.setup(this, !againstStockfish);
 
 
 //    Button btn = new Button(this);

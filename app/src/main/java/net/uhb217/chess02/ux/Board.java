@@ -16,6 +16,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.NotNull;
 
 import net.uhb217.chess02.R;
+import net.uhb217.chess02.ui.BottomGameControls;
+import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.pieces.Bishop;
 import net.uhb217.chess02.ux.pieces.King;
 import net.uhb217.chess02.ux.pieces.Knight;
@@ -43,11 +45,14 @@ public class Board extends FrameLayout {
   private Color color;
   private Color turnColor = WHITE; // Default turn color
   public boolean isGameOver = false;
+  public boolean isDrawOffered = false;
   private int fullMoves = 1;
   public int halfMoves = 0; // Halfmove clock for fifty-move rule
   public final DatabaseReference db;
   private final int depth;
-  private final ValueEventListener resignValueListener = FirebaseUtils.ValueListener(snapshot -> {if (snapshot.exists()) Dialogs.INSTANCE.showGameOverDialog(getContext(), color, "Resignation");});
+  private final ValueEventListener resignValueListener = FirebaseUtils.ValueListener(snapshot -> {
+    if (snapshot.exists()) gameOverCleanup(color, "Resignation");
+  });
 
   public Board(Context ctx, Color color, @NotNull String roomId) {
     super(ctx);
@@ -241,7 +246,7 @@ public class Board extends FrameLayout {
     else if (!isSufficientMaterial()) gameOver = "Draw";
 
     if (gameOver != null)
-      Dialogs.INSTANCE.showGameOverDialog(getContext(), turnColor, gameOver);
+      gameOverCleanup(turnColor, gameOver);
     else {
       turnColor = turnColor.opposite();
       if (depth != -1 && !bySystem)
@@ -275,7 +280,7 @@ public class Board extends FrameLayout {
       throw new IllegalStateException("Database reference is not initialized.");
 
     db.child("moves").addValueEventListener(FirebaseUtils.ValueListener(snapshot -> {
-      if (snapshot.exists() && turnColor == color.opposite()) {
+      if (snapshot.exists()) {
         List<String> moves = new ArrayList<>();
         for (DataSnapshot child : snapshot.getChildren())
           moves.add(child.getValue(String.class));
@@ -287,6 +292,20 @@ public class Board extends FrameLayout {
       }
     }));
     db.child("resign").addValueEventListener(resignValueListener);
+    db.child("draw").addValueEventListener(FirebaseUtils.ValueListener(snapshot -> {
+      if (snapshot.exists()) {
+        int value = snapshot.getValue(Integer.class);
+        if (value == 1 && !isDrawOffered)
+          Dialogs.INSTANCE.drawOfferDialog(getContext(), db);
+        else if (value == 2) {
+          Dialogs.INSTANCE.dismissWaitForDrawResponseDialog();
+          gameOverCleanup(null, "");
+        } else if (value == 3) {
+          Dialogs.INSTANCE.dismissWaitForDrawResponseDialog();
+          isDrawOffered = false;
+        }
+      }
+    }));
   }
 
   public String toFEN() {
@@ -431,7 +450,32 @@ public class Board extends FrameLayout {
       db.child("resign").removeEventListener(resignValueListener);
       db.child("resign").setValue(true);
     }
-    Dialogs.INSTANCE.showGameOverDialog(getContext(), color.opposite(), "Resignation");
+    gameOverCleanup(color.opposite(), "Resignation");
+  }
+
+  public void offerDraw() {
+    db.child("draw").setValue(1);
+    isDrawOffered = true;
+    Dialogs.INSTANCE.waitForDrawResponseDialog(getContext());
+  }
+
+  public void acceptDraw() {
+
+  }
+
+  public void gameOverCleanup(Color winner, String reason) {
+    Activity activity = (Activity) getContext();
+    isGameOver = true;
+    BottomGameControls.INSTANCE.disable(activity);
+
+    if (depth == -1) {
+      PlayerInfoView top = activity.findViewById(R.id.top_player_info_view);
+      PlayerInfoView bottom = activity.findViewById(R.id.bottom_player_info_view);
+      double gameStatus = winner == null ? 0.5 : winner == color ? 1 : 0;
+      bottom.updateRating(top.getRating(), gameStatus);
+    }
+
+    Dialogs.INSTANCE.showGameOverDialog(getContext(), winner, reason);
   }
 
 }

@@ -1,3 +1,5 @@
 <resources>
     <item name="lottie" type="id"/>
+    <item name="top_player_info_view" type="id"/>
+    <item name="bottom_player_info_view" type="id"/>
 </resources>

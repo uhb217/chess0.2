@@ -79,8 +79,6 @@ object StockfishApi {
                         waitAnimation.progress = 0f
                         BoardUtils.playMove(BoardUtils.UCI2Move(json.getString("bestmove")))
                     }
-                    Handler(Looper.getMainLooper()).post {
-                    }
                 }
             }
         })

@@ -1,7 +1,5 @@
 package net.uhb217.chess02.ux.utils
 
-import android.util.Log
-
 object MoveHistory {
     private var current: LinkedNode? = null
     private var tail: LinkedNode? = null
@@ -19,7 +17,6 @@ object MoveHistory {
 
     fun moveBack(): String? {
         current = current?.prev ?: return null
-        Log.d("MoveHistory", "moveBack: ${current!!.fen}")
         return current!!.fen
     }
 

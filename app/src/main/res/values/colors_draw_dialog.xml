@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dialog background: dark, but not black -->
+    <color name="draw_dialog_bg">#363738</color>
+    <!-- Dialog accent: matches the green sand in the animation -->
+    <color name="draw_dialog_accent">#2CFCC2</color>
+    <!-- Dialog text: white for contrast -->
+    <color name="draw_dialog_text">#FFFFFF</color>
+    <!-- Dialog border: a slightly lighter gray for subtle border -->
+    <color name="draw_dialog_border">#4A4B4D</color>
+</resources>
+

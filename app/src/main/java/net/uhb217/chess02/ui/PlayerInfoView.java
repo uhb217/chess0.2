@@ -13,6 +13,8 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.Player;
@@ -50,7 +52,6 @@ public class PlayerInfoView extends LinearLayout {
     nameRatingLayout.setLayoutParams(nameRatingParams);
 
     playerName = new TextView(ctx);
-    playerName.setId(View.generateViewId());
     playerName.setText(player.username);
     playerName.setTextColor(Color.WHITE);
     playerName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -58,7 +59,6 @@ public class PlayerInfoView extends LinearLayout {
     nameRatingLayout.addView(playerName);
 
     playerRating = new TextView(ctx);
-    playerRating.setId(View.generateViewId());
     playerRating.setText(String.valueOf(player.rating));
     playerRating.setTextColor(Color.WHITE);
     playerRating.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
@@ -88,7 +88,7 @@ public class PlayerInfoView extends LinearLayout {
       lottieView.setId(R.id.lottie);
       addView(lottieView, 2);
     }
-    
+
   }
 
   private int dp(Context ctx, int dp) {
@@ -99,9 +99,24 @@ public class PlayerInfoView extends LinearLayout {
     playerTime.setText(time);
   }
 
-  public void setPlayer(Player player) {
-    playerName.setText(player.username);
-    playerRating.setText(String.valueOf(player.rating));
+  public int getRating() {
+    return Integer.parseInt(playerRating.getText().toString());
+  }
+
+  public void updateRating(int opponentRating, double gameStatus) {
+    int toAdd = (int) Math.round(16 * (gameStatus - 1.0 / (1 + Math.pow(10, (opponentRating - getRating()) / 400.0))));
+
+    int newRating = getRating() + toAdd;
+    // Only update if the username matches the current user's username
+
+    String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+    FirebaseDatabase.getInstance().getReference("users")
+        .child(currentUserName).child("rating").setValue(newRating);
+
+
+    String score = toAdd > 0 ? " +" + toAdd : " -" + -toAdd;
+    playerRating.setText(playerRating.getText().toString() + score);
+
   }
 
   public static void overrideXMLPlayerInfoView(LinearLayout frame, Player player) {

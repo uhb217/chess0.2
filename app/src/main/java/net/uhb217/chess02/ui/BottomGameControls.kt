@@ -12,14 +12,14 @@ object BottomGameControls {
     fun resignBtn(activity: Activity): View = activity.findViewById(R.id.resign_btn)
     fun drawBtn(activity: Activity): View = activity.findViewById(R.id.draw_btn)
 
-    fun setup(activity: Activity, withDrawOption: Boolean = true) {
+    fun setup(activity: Activity, withDrawOption: Boolean) {
         val board = Board.getInstance()
         backBtn(activity).setOnClickListener { board.fromFEN(MoveHistory.moveBack()) }
         forwardBtn(activity).setOnClickListener { board.fromFEN(MoveHistory.moveForward()) }
         resignBtn(activity).setOnClickListener { board.resign() }
 
         if (withDrawOption)
-            drawBtn(activity).setOnClickListener { }
+            drawBtn(activity).setOnClickListener { board.offerDraw() }
     }
 
     fun disable(activity: Activity) {

@@ -14,6 +14,9 @@ public class Player implements Serializable {
   public int rating = 1600; // Default rating
   public int timeSeconds;
   private Color color;
+  public Player() {
+    username = null;
+  }
 
 
   public Player(String username, int rating, Color color) {

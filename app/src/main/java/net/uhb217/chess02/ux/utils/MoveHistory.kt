@@ -1,26 +1,31 @@
 package net.uhb217.chess02.ux.utils
 
+import android.util.Log
+
 object MoveHistory {
     private var current: LinkedNode? = null
     private var tail: LinkedNode? = null
+    public var length = 0
 
     fun push(move: String) {
         val newNode = LinkedNode(move, prev = tail)
         tail?.next = newNode
         tail = newNode
         current = tail
+        length++
     }
 
     fun peek(): LinkedNode? = current
 
-    fun moveBack(): LinkedNode? {
+    fun moveBack(): String? {
         current = current?.prev ?: return null
-        return current
+        Log.d("MoveHistory", "moveBack: ${current!!.fen}")
+        return current!!.fen
     }
 
-    fun moveForward(): LinkedNode? {
+    fun moveForward(): String? {
         current = current?.next ?: return null
-        return current
+        return current?.fen
     }
 
     fun isEmpty(): Boolean = tail == null
@@ -28,10 +33,15 @@ object MoveHistory {
     fun canMoveForward(): Boolean = current?.next != null
 
     fun canMoveBack(): Boolean = current?.prev != null
+    fun clear() {
+        current = null
+        tail = null
+        length = 0
+    }
 }
 
 data class LinkedNode(
-    val fen: String,
+    val fen: String? = null,
     var next: LinkedNode? = null,
     var prev: LinkedNode? = null
 )

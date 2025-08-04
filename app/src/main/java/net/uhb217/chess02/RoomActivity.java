@@ -26,6 +26,7 @@ import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
+import net.uhb217.chess02.ux.utils.MoveHistory;
 import net.uhb217.chess02.ux.utils.StockfishApi;
 
 import java.util.Random;
@@ -39,6 +40,7 @@ public class RoomActivity extends AppCompatActivity {
   @SuppressLint("ClickableViewAccessibility")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    MoveHistory.INSTANCE.clear();
     super.onCreate(savedInstanceState);
     EdgeToEdge.enable(this);
     setContentView(R.layout.activity_room);
@@ -78,7 +80,7 @@ public class RoomActivity extends AppCompatActivity {
         }
         Player player1 = snapshot.child("player1").getValue(Player.class);
         Player player2 = snapshot.child("player2").getValue(Player.class);
-        if (player2 != null || player1 == null) {
+        if (player2 != null || player1 == null ) {
           roomIdInput.setError("Room is already full or closed");
           return;
         }

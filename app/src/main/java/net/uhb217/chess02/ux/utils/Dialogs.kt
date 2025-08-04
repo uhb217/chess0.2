@@ -13,6 +13,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import net.uhb217.chess02.R
 import net.uhb217.chess02.RoomActivity
+import net.uhb217.chess02.ui.BottomGameControls
+import net.uhb217.chess02.ux.Board
 
 
 object Dialogs {
@@ -62,6 +64,9 @@ object Dialogs {
     }
 
     fun showGameOverDialog(ctx: Context, winner: Color, reason: String) {
+        Board.getInstance().isGameOver = true
+        BottomGameControls.disable(ctx as Activity)
+
         val dialog = Dialog(ctx)
         dialog.setContentView(R.layout.dialog_game_over)
         dialog.setCancelable(false)

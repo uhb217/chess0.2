@@ -53,17 +53,18 @@ public class Pawn extends Piece {
       Dialogs.INSTANCE.showPromotionDialog(getContext(), color, pieceChar -> {
         Piece newPiece = BoardUtils.newPieceFromChar(pieceChar, getContext(), new Pos(x, y), color);
         if (newPiece != null) {
-          if (!bySystem) board.sendMoveToFirebase(BoardUtils.move2UCI(lastX,lastY,x, y) + pieceChar);
+          if (!bySystem)
+            board.sendMoveToFirebase(BoardUtils.move2UCI(lastX, lastY, x, y) + pieceChar);
           newPiece.placeAt(x, y);
           board.addView(newPiece);
-          MoveHistory.INSTANCE.push(BoardUtils.move2UCI(pos.x, pos.y, x, y));
+          MoveHistory.INSTANCE.push(board.toFEN());
           board.nextTurn(bySystem);
         }
       });
     } else {
       if (!bySystem)
         board.sendMoveToFirebase(BoardUtils.move2UCI(lastX, lastY, x, y));
-      MoveHistory.INSTANCE.push(BoardUtils.move2UCI(pos.x, pos.y, x, y));
+      MoveHistory.INSTANCE.push(board.toFEN());
       board.nextTurn(bySystem);
     }
   }

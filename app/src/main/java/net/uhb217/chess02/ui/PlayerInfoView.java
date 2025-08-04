@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
+
 import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.Player;
 
@@ -21,7 +23,7 @@ public class PlayerInfoView extends LinearLayout {
   private TextView playerRating;
   private TextView playerTime;
 
-  public PlayerInfoView(Context ctx, Player player) {
+  public PlayerInfoView(Context ctx, Player player, boolean againstStockfish) {
     super(ctx);
     setOrientation(HORIZONTAL);
     setGravity(Gravity.CENTER_VERTICAL);
@@ -67,12 +69,26 @@ public class PlayerInfoView extends LinearLayout {
     // Time
     playerTime = new TextView(ctx);
     playerTime.setId(View.generateViewId());
-    playerTime.setText("10:00"); // Default, can be updated
+    if (!againstStockfish)
+      playerTime.setText("10:00"); // Default, can be updated
     playerTime.setTextColor(Color.WHITE);
     playerTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
     playerTime.setBackground(ContextCompat.getDrawable(ctx, R.drawable.time_bg));
     playerTime.setPadding(dp(ctx, 8), dp(ctx, 8), dp(ctx, 8), dp(ctx, 8));
     addView(playerTime);
+
+    //if the player is stockfish add lottie animation between the time and the name 
+    if (player.username.equals("Stockfish")) {
+      LottieAnimationView lottieView = new LottieAnimationView(ctx);
+      LinearLayout.LayoutParams lottieParams = new LinearLayout.LayoutParams(dp(ctx, 40), dp(ctx, 40));
+      lottieParams.setMarginEnd(dp(ctx, 12));
+      lottieView.setLayoutParams(lottieParams);
+      lottieView.setAnimation("move_waiting.json");
+      lottieView.setRepeatCount(-1);
+      lottieView.setId(R.id.lottie);
+      addView(lottieView, 2);
+    }
+    
   }
 
   private int dp(Context ctx, int dp) {

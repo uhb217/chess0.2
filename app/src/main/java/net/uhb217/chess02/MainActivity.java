@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.database.FirebaseDatabase;
 
+import net.uhb217.chess02.ui.BottomGameControls;
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
@@ -42,31 +43,33 @@ public class MainActivity extends AppCompatActivity {
 
     rootLayout = findViewById(R.id.board_container);
     String roomId = getIntent().getStringExtra("roomId");
-    if (roomId.length() == 6)
+    boolean againstStockfish = roomId.length() == 6;
+    if (againstStockfish)
       board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
     else
       board = new Board(this, mainPlayer.getColor(),Integer.parseInt(roomId));
 
-    topPlayerInfoView = new PlayerInfoView(this, opponentPlayer);
-    bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer);
+    topPlayerInfoView = new PlayerInfoView(this, opponentPlayer, againstStockfish);
+    bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer, againstStockfish);
 
     rootLayout.addView(topPlayerInfoView);
     rootLayout.addView(board);
     rootLayout.addView(bottomPlayerInfoView);
 
-    bottomGameControlsSetup();
+//    bottomGameControlsSetup();
+    BottomGameControls.INSTANCE.setup(this, againstStockfish);
 
 
-    Button btn = new Button(this);
-    btn.setText("Play Move");
-    btn.setOnClickListener(view -> Log.d("fen: ", board.toFEN()));
-    rootLayout.addView(btn);
+//    Button btn = new Button(this);
+//    btn.setText("Play Move");
+//    btn.setOnClickListener(view -> Log.d("fen: ", board.toFEN()));
+//    rootLayout.addView(btn);
 
   }
   private void bottomGameControlsSetup(){
-    findViewById(R.id.back_btn).setOnClickListener(view -> Board.getInstance().fromFEN(MoveHistory.INSTANCE.moveBack().getFen()));
-    findViewById(R.id.forward_btn).setOnClickListener(view -> Board.getInstance().fromFEN(MoveHistory.INSTANCE.moveForward().getFen()));
-    findViewById(R.id.resign_btn).setOnClickListener(view -> {});
+    findViewById(R.id.back_btn).setOnClickListener(view -> Board.getInstance().fromFEN(MoveHistory.INSTANCE.moveBack()));
+    findViewById(R.id.forward_btn).setOnClickListener(view -> Board.getInstance().fromFEN(MoveHistory.INSTANCE.moveForward()));
+    findViewById(R.id.resign_btn).setOnClickListener(view -> Board.getInstance().resign());
     findViewById(R.id.draw_btn).setOnClickListener(view -> {});
 
   }

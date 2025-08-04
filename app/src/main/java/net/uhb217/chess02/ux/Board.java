@@ -3,13 +3,16 @@ package net.uhb217.chess02.ux;
 import static net.uhb217.chess02.ux.utils.Color.BLACK;
 import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
+import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.NotNull;
 
 import net.uhb217.chess02.R;
@@ -25,6 +28,7 @@ import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.MoveHistory;
+import net.uhb217.chess02.ux.utils.Point;
 import net.uhb217.chess02.ux.utils.Pos;
 import net.uhb217.chess02.ux.utils.StockfishApi;
 
@@ -38,10 +42,12 @@ public class Board extends FrameLayout {
   public Pos enPassant = null; // For en passant capture
   private Color color;
   private Color turnColor = WHITE; // Default turn color
+  public boolean isGameOver = false;
   private int fullMoves = 1;
   public int halfMoves = 0; // Halfmove clock for fifty-move rule
   public final DatabaseReference db;
   private final int depth;
+  private final ValueEventListener resignValueListener = FirebaseUtils.ValueListener(snapshot -> {if (snapshot.exists()) Dialogs.INSTANCE.showGameOverDialog(getContext(), color, "Resignation");});
 
   public Board(Context ctx, Color color, @NotNull String roomId) {
     super(ctx);
@@ -50,7 +56,7 @@ public class Board extends FrameLayout {
 
     standardSetup(ctx, color);
 
-    startListeningForOpponentMoves();
+    startListeningForOpponentActions();
   }
 
   /**
@@ -67,6 +73,7 @@ public class Board extends FrameLayout {
 
     standardSetup(ctx, color);
   }
+
   private void standardSetup(Context ctx, Color color) {
     this.color = color;
     int screenWidth = ctx.getResources().getDisplayMetrics().widthPixels; // Subtracting 4 for padding
@@ -79,6 +86,7 @@ public class Board extends FrameLayout {
     initializeBoard();
     MoveHistory.INSTANCE.push(toFEN());
   }
+
   private void initializeBoard() {
     board = new Piece[8][8];
     // Place pawns
@@ -234,9 +242,11 @@ public class Board extends FrameLayout {
 
     if (gameOver != null)
       Dialogs.INSTANCE.showGameOverDialog(getContext(), turnColor, gameOver);
-    turnColor = turnColor.opposite();
-    if (depth != -1 && !bySystem && gameOver == null)
-      StockfishApi.INSTANCE.playBestMove(toFEN(), depth);
+    else {
+      turnColor = turnColor.opposite();
+      if (depth != -1 && !bySystem)
+        StockfishApi.INSTANCE.playBestMove(toFEN(), depth, ((Activity) getContext()).findViewById(R.id.lottie));
+    }
   }
 
   public Color getTurnColor() {
@@ -260,7 +270,7 @@ public class Board extends FrameLayout {
     });
   }
 
-  private void startListeningForOpponentMoves() {
+  private void startListeningForOpponentActions() {
     if (db == null)
       throw new IllegalStateException("Database reference is not initialized.");
 
@@ -276,6 +286,7 @@ public class Board extends FrameLayout {
         }
       }
     }));
+    db.child("resign").addValueEventListener(resignValueListener);
   }
 
   public String toFEN() {
@@ -331,6 +342,10 @@ public class Board extends FrameLayout {
   }
 
   public void fromFEN(String fen) {
+    if (fen == null) {
+      Log.d("Board", "fromFEN: FEN is null");
+      return;
+    }
     clearBoard();
 
     String[] fenParts = fen.split(" ");
@@ -398,6 +413,10 @@ public class Board extends FrameLayout {
   }
 
   private void clearBoard() {
+    //remove all points
+    for (int i = 0; i < getChildCount(); i++)
+      if (getChildAt(i) instanceof Point)
+        removeViewAt(i--);
     // Remove all pieces from the board
     for (int rank = 0; rank < 8; rank++)
       for (int file = 0; file < 8; file++) {
@@ -405,6 +424,14 @@ public class Board extends FrameLayout {
           this.removeView(board[file][rank]);
         board[file][rank] = null;
       }
+  }
+
+  public void resign() {
+    if (depth == -1) {
+      db.child("resign").removeEventListener(resignValueListener);
+      db.child("resign").setValue(true);
+    }
+    Dialogs.INSTANCE.showGameOverDialog(getContext(), color.opposite(), "Resignation");
   }
 
 }

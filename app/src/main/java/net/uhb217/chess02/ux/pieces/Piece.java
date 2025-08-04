@@ -38,7 +38,7 @@ public abstract class Piece extends AppCompatImageView {
 
   public List<Pos> getLegalMoves() {
     Board board = Board.getInstance();
-    if (board.getTurnColor() == board.getColor() && board.getTurnColor() == color)
+    if (board.getTurnColor() == board.getColor() && board.getTurnColor() == color && !MoveHistory.INSTANCE.canMoveForward() && !board.isGameOver)
       return this instanceof King ? getLegalMoves(board.getBoard()) :
         getLegalMoves(board.getBoard()).stream()
             .filter(p -> !isPinnedToKing(p)).collect(Collectors.toList());
@@ -108,11 +108,11 @@ public abstract class Piece extends AppCompatImageView {
     Board board = Board.getInstance();
     if (!bySystem)
       board.sendMoveToFirebase(BoardUtils.move2UCI(pos.x, pos.y, x, y));
-    MoveHistory.INSTANCE.push(board.toFEN());
     placeAt(x, y);
     removeAllPoints();
     board.setClickedPiece(null);
     board.enPassant = null; // Reset en passant target square after a move
+    MoveHistory.INSTANCE.push(board.toFEN());
     board.nextTurn(bySystem);
   }
 

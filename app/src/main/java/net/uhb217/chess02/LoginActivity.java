@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ui.Dialogs;
 
 public class LoginActivity extends AppCompatActivity {
   EditText username, password;

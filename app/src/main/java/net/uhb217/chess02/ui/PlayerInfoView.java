@@ -41,7 +41,10 @@ public class PlayerInfoView extends LinearLayout {
     LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(ctx, 40), dp(ctx, 40));
     iconParams.setMarginEnd(dp(ctx, 12));
     playerIcon.setLayoutParams(iconParams);
-    playerIcon.setImageResource(R.drawable.ic_player);
+    if (player.username.equals("Stockfish"))
+      playerIcon.setImageResource(R.drawable.stockfish);
+    else
+      playerIcon.setImageResource(R.drawable.ic_player);
     playerIcon.setBackground(ContextCompat.getDrawable(ctx, R.drawable.circle_bg));
     addView(playerIcon);
 
@@ -69,8 +72,8 @@ public class PlayerInfoView extends LinearLayout {
     // Time
     playerTime = new TextView(ctx);
     playerTime.setId(View.generateViewId());
-    if (!againstStockfish)
-      playerTime.setText("10:00"); // Default, can be updated
+//    if (!againstStockfish)
+//      playerTime.setText("10:00"); // Default, can be updated
     playerTime.setTextColor(Color.WHITE);
     playerTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
     playerTime.setBackground(ContextCompat.getDrawable(ctx, R.drawable.time_bg));

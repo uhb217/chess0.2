@@ -14,7 +14,7 @@
         android:textAlignment="center"
         android:text="Draw Offer has been sent"
         android:textSize="20sp"
-        android:textColor="@color/draw_dialog_text"
+        android:textColor="#1C1C1D"
         />
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottie_draw_offer_sent"
@@ -25,3 +25,4 @@
         app:lottie_fileName="loading_sand_clock.json" />
 
 </LinearLayout>
+

@@ -1,25 +1,26 @@
-package net.uhb217.chess02.ux.utils
+package net.uhb217.chess02.ui
 
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.SeekBar
 import android.widget.TextView
+import androidx.core.graphics.drawable.toDrawable
 import com.google.firebase.database.DatabaseReference
 import net.uhb217.chess02.R
-import net.uhb217.chess02.RoomActivity
-import net.uhb217.chess02.ux.Board
-
+import net.uhb217.chess02.ux.utils.Color
 
 object Dialogs {
+
     fun showPromotionDialog(ctx: Context, color: Color, callback: PromotionCallback) {
-        val dialog = Dialog(ctx)
+        val dialog = TransparentDialog(ctx)
         dialog.setContentView(R.layout.dialog_promotion)
         dialog.setCancelable(false)
 
@@ -30,28 +31,27 @@ object Dialogs {
         val bishop = dialog.findViewById<ImageButton>(R.id.promoBishop)
         val knight = dialog.findViewById<ImageButton>(R.id.promoKnight)
 
-        // Dynamically load the correct drawable
-        queen.setImageResource(getDrawableId(ctx, prefix + "q"))
-        rook.setImageResource(getDrawableId(ctx, prefix + "r"))
-        bishop.setImageResource(getDrawableId(ctx, prefix + "b"))
-        knight.setImageResource(getDrawableId(ctx, prefix + "n"))
+        queen.setImageResource(getDrawableId(ctx, "${prefix}q"))
+        rook.setImageResource(getDrawableId(ctx, "${prefix}r"))
+        bishop.setImageResource(getDrawableId(ctx, "${prefix}b"))
+        knight.setImageResource(getDrawableId(ctx, "${prefix}n"))
 
-        queen.setOnClickListener { v: View ->
+        queen.setOnClickListener {
             callback.onPieceChosen('q')
             dialog.dismiss()
         }
 
-        rook.setOnClickListener { v: View ->
+        rook.setOnClickListener {
             callback.onPieceChosen('r')
             dialog.dismiss()
         }
 
-        bishop.setOnClickListener { v: View ->
+        bishop.setOnClickListener {
             callback.onPieceChosen('b')
             dialog.dismiss()
         }
 
-        knight.setOnClickListener { v: View ->
+        knight.setOnClickListener {
             callback.onPieceChosen('n')
             dialog.dismiss()
         }
@@ -64,7 +64,7 @@ object Dialogs {
     }
 
     fun showGameOverDialog(ctx: Context, winner: Color?, reason: String) {
-        val dialog = Dialog(ctx)
+        val dialog = TransparentDialog(ctx)
         dialog.setContentView(R.layout.dialog_game_over)
         dialog.setCancelable(false)
 
@@ -79,20 +79,17 @@ object Dialogs {
 
         if (winner == null) {
             resultText.text = "Draw!"
-            reasonText.text = "by agriment"
+            reasonText.text = "by agreement"
         } else {
             resultText.text = "${winner.name} wins!"
             reasonText.text = "by $reason"
         }
 
-        btnSeePosition.setOnClickListener { v: View -> dialog.dismiss() }
+        btnSeePosition.setOnClickListener { dialog.dismiss() }
 
-        btnExit.setOnClickListener { v: View ->
+        btnExit.setOnClickListener {
             dialog.dismiss()
-            ctx.startActivity(
-                Intent(ctx, RoomActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            )
+            ctx.finish()
         }
 
         dialog.show()
@@ -100,42 +97,37 @@ object Dialogs {
 
     private var waitingDialog: AlertDialog? = null
 
-    fun showWaitingDialog(ctx: Context?, roomId: String, onCancel: Runnable): Dialog {
-        val builder = AlertDialog.Builder(ctx)
+    fun showWaitingDialog(ctx: Context, roomId: String, onCancel: Runnable): Dialog {
+        val dialog = TransparentDialog(ctx)
         val view = LayoutInflater.from(ctx).inflate(R.layout.waiting_dialog, null)
-        builder.setView(view)
-        builder.setCancelable(false)
+        dialog.setContentView(view)
+        dialog.setCancelable(false)
 
         val roomIdText = view.findViewById<TextView>(R.id.roomIdText)
-        roomIdText.text = "Room ID: " + roomId
-        roomIdText.setFocusable(false)
-        roomIdText.isFocusableInTouchMode = false
-
-        waitingDialog = builder.create()
-        waitingDialog!!.show()
+        roomIdText.text = "Room ID: $roomId"
 
         val statusText = view.findViewById<TextView>(R.id.statusText)
         val blinkAnimation = AnimationUtils.loadAnimation(ctx, R.anim.blink)
         statusText.startAnimation(blinkAnimation)
 
-
         val cancelButton = view.findViewById<Button>(R.id.cancelButton)
-        cancelButton.setOnClickListener { v: View? ->
+        cancelButton.setOnClickListener {
             statusText.clearAnimation()
-            if (waitingDialog != null && waitingDialog!!.isShowing) {
-                waitingDialog!!.dismiss()
-            }
+            dialog.dismiss()
             onCancel.run()
         }
-        return waitingDialog!!
+
+        dialog.show()
+        return dialog
     }
 
+
     fun dismissWaitingDialog() {
-        if (waitingDialog != null && waitingDialog!!.isShowing) waitingDialog!!.dismiss()
+        waitingDialog?.takeIf { it.isShowing }?.dismiss()
     }
 
     fun loginWaitingDialog(ctx: Context): Dialog {
-        val dialog = Dialog(ctx)
+        val dialog = TransparentDialog(ctx)
         val dialogView = LayoutInflater.from(ctx).inflate(R.layout.login_waiting_dialog, null)
         dialog.setContentView(dialogView)
         dialog.setCancelable(false)
@@ -149,8 +141,8 @@ object Dialogs {
         return dialog
     }
 
-    fun drawOfferDialog(ctx: Context, db: DatabaseReference){
-        val dialog = Dialog(ctx)
+    fun drawOfferDialog(ctx: Context, db: DatabaseReference) {
+        val dialog = TransparentDialog(ctx)
         dialog.setContentView(R.layout.dialog_draw_offer)
         dialog.setCancelable(false)
 
@@ -169,16 +161,52 @@ object Dialogs {
     }
 
     private var waitForDrawResponse: Dialog? = null
-    fun waitForDrawResponseDialog(ctx: Context){
-        waitForDrawResponse = Dialog(ctx)
-        waitForDrawResponse?.setContentView(R.layout.dialog_draw_offer_sent)
-        waitForDrawResponse?.setCancelable(false)
-        waitForDrawResponse?.show()
+
+    fun waitForDrawResponseDialog(ctx: Context) {
+        waitForDrawResponse = TransparentDialog(ctx).apply {
+            setContentView(R.layout.dialog_draw_offer_sent)
+            setCancelable(false)
+            show()
+        }
     }
-    fun dismissWaitForDrawResponseDialog() = waitForDrawResponse?.dismiss()
 
+    fun dismissWaitForDrawResponseDialog() {
+        waitForDrawResponse?.dismiss()
+    }
+    private var stockfishElo: Int = 15
+    fun stockfishDialog(ctx: Context, onPress: Runnable){
+        val dialog = TransparentDialog(ctx)
+        dialog.setContentView(R.layout.dialog_stockfish_elo)
 
+        dialog.findViewById<Button>(R.id.start_game).setOnClickListener {
+            onPress.run()
+            dialog.dismiss()
+        }
+
+        val seekBar: SeekBar = dialog.findViewById(R.id.seekbar_stockfish_elo)
+        val eloView: TextView = dialog.findViewById(R.id.stockfish_elo_value)
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: SeekBar?, value: Int, p2: Boolean) {
+                eloView.text = value.toString()
+                stockfishElo = value
+            }
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
+
+        dialog.show()
+    }
+    fun getStockfishElo(): Int{
+        return stockfishElo
+    }
     interface PromotionCallback {
         fun onPieceChosen(piece: Char)
+    }
+
+    class TransparentDialog(ctx: Context) : Dialog(ctx) {
+        init {
+            window?.setBackgroundDrawable(android.graphics.Color.TRANSPARENT.toDrawable())
+        }
     }
 }

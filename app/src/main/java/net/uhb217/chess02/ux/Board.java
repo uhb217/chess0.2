@@ -27,7 +27,7 @@ import net.uhb217.chess02.ux.pieces.Queen;
 import net.uhb217.chess02.ux.pieces.Rook;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
-import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ui.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.MoveHistory;
 import net.uhb217.chess02.ux.utils.Point;
@@ -457,10 +457,6 @@ public class Board extends FrameLayout {
     db.child("draw").setValue(1);
     isDrawOffered = true;
     Dialogs.INSTANCE.waitForDrawResponseDialog(getContext());
-  }
-
-  public void acceptDraw() {
-
   }
 
   public void gameOverCleanup(Color winner, String reason) {

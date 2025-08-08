@@ -142,6 +142,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="8dp"
+        android:foreground="@drawable/ripple_effect"
         android:background="@drawable/rounded_lottie_bg"
         android:clipToOutline="true">
 

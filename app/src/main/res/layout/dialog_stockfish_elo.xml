@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_stockfish_elo_dialog"
+    android:gravity="center_horizontal">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/stockfish"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose Stockfish elo"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/primary"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/stockfish_elo_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="15"
+        android:textColor="@color/primary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+    <SeekBar
+        android:id="@+id/seekbar_stockfish_elo"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:min="1"
+        android:max="30"
+        android:progress="15"
+        android:layout_marginBottom="20dp"
+        android:thumbTint="@color/primary"
+        android:progressTint="@color/primaryLight"
+        />
+
+    <Button
+        android:id="@+id/start_game"
+        android:layout_width="120dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/primary"
+        android:text="Play"
+        android:textColor="@color/draw_dialog_bg"
+        android:textStyle="bold"
+        android:elevation="2dp"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

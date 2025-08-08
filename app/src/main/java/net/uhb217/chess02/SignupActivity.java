@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 
-import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ui.Dialogs;
 
 import java.util.Map;
 

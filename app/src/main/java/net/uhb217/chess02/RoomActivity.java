@@ -1,7 +1,6 @@
 package net.uhb217.chess02;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,14 +22,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.Color;
-import net.uhb217.chess02.ux.utils.Dialogs;
+import net.uhb217.chess02.ui.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.MoveHistory;
-import net.uhb217.chess02.ux.utils.StockfishApi;
 
 import java.util.Random;
 
-public class RoomActivity extends AppCompatActivity {
+public class RoomActivity extends NoBackGestureActivity {
   Button createRoomButton, joinButton;
   FrameLayout playVSStockfish;
   EditText roomIdInput;
@@ -93,11 +90,15 @@ public class RoomActivity extends AppCompatActivity {
       }));
     });
     playVSStockfish = findViewById(R.id.play_vs_stockfish);
-    playVSStockfish.setOnClickListener(view -> {
-      Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
-          ,player -> startGameActivity("15", player.setColor(Color.WHITE)
-          ,Player.Stockfish(15)));
-    });
+    playVSStockfish.setOnClickListener(view -> Dialogs.INSTANCE.stockfishDialog(this
+        ,()-> Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
+            ,player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
+                ,Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))));
+//    playVSStockfish.setOnClickListener(view -> {
+//      Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
+//          ,player -> startGameActivity("15", player.setColor(Color.WHITE)
+//          ,Player.Stockfish(15)));
+//    });
   }
 
   public void createUniqueRoom(Context context) {
@@ -117,7 +118,7 @@ public class RoomActivity extends AppCompatActivity {
       if (snapshot.exists())// Retry if room already exists
         tryGenerateRoom(context, attempts + 1);
       else {
-        Dialog waitingDialog = Dialogs.INSTANCE.showWaitingDialog(context, roomId, roomRef::removeValue);
+        Dialogs.INSTANCE.showWaitingDialog(context, roomId, roomRef::removeValue);
         // Room is safe to create
         Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
           if (player != null) {
@@ -157,15 +158,7 @@ public class RoomActivity extends AppCompatActivity {
     intent.putExtra("mainPlayer", mainPlayer);
     intent.putExtra("opponentPlayer", opponentPlayer);
     intent.putExtra("roomId", roomId);
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
     startActivity(intent);
   }
-
-  @Override
-  protected void onDestroy() {
-    super.onDestroy();
-    Dialogs.INSTANCE.dismissWaitingDialog();
-  }
-
-  // Helper method for color blending
 }

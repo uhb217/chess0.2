@@ -19,7 +19,7 @@ import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.MoveHistory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends NoBackGestureActivity {
   private Board board;
   LinearLayout rootLayout;
   PlayerInfoView topPlayerInfoView, bottomPlayerInfoView;
@@ -59,23 +59,9 @@ public class MainActivity extends AppCompatActivity {
     rootLayout.addView(board);
     rootLayout.addView(bottomPlayerInfoView);
 
-//    bottomGameControlsSetup();
     BottomGameControls.INSTANCE.setup(this, !againstStockfish);
-
-
-//    Button btn = new Button(this);
-//    btn.setText("Play Move");
-//    btn.setOnClickListener(view -> Log.d("fen: ", board.toFEN()));
-//    rootLayout.addView(btn);
-
   }
-  private void bottomGameControlsSetup(){
-    findViewById(R.id.back_btn).setOnClickListener(view -> Board.getInstance().fromFEN(MoveHistory.INSTANCE.moveBack()));
-    findViewById(R.id.forward_btn).setOnClickListener(view -> Board.getInstance().fromFEN(MoveHistory.INSTANCE.moveForward()));
-    findViewById(R.id.resign_btn).setOnClickListener(view -> Board.getInstance().resign());
-    findViewById(R.id.draw_btn).setOnClickListener(view -> {});
 
-  }
   @Override
   protected void onDestroy() {
     super.onDestroy();

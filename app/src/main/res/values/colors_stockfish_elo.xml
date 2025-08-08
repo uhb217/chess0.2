@@ -1,0 +1,9 @@
+<resources>
+    <color name="dialogBackground">#23272F</color>
+    <color name="primary">#FFB300</color>
+    <color name="primaryLight">#FFE082</color>
+    <color name="primaryText">#FFFFFF</color>
+    <color name="onPrimary">#23272F</color>
+    <color name="seekbarTrack">#67707C</color>
+</resources>
+

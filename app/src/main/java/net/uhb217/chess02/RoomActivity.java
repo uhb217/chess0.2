@@ -4,13 +4,17 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -32,7 +36,10 @@ public class RoomActivity extends NoBackGestureActivity {
   Button createRoomButton, joinButton;
   FrameLayout playVSStockfish;
   EditText roomIdInput;
+  ImageView clientIcon;
   private boolean triggered = false;
+  private ActivityResultLauncher<Void> takePicture;
+
 
   @SuppressLint("ClickableViewAccessibility")
   @Override
@@ -48,9 +55,15 @@ public class RoomActivity extends NoBackGestureActivity {
     });
 
 
+
     createRoomButton = findViewById(R.id.create_room_button);
     joinButton = findViewById(R.id.join_button);
     roomIdInput = findViewById(R.id.room_code_edit);
+    clientIcon = findViewById(R.id.player_bottom_icon);
+
+    takePicture = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), clientIcon::setImageBitmap);
+
+    clientIcon.setOnClickListener(view -> clientIconClick());
 
     Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
       if (player != null)
@@ -94,11 +107,6 @@ public class RoomActivity extends NoBackGestureActivity {
         ,()-> Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
             ,player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
                 ,Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))));
-//    playVSStockfish.setOnClickListener(view -> {
-//      Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
-//          ,player -> startGameActivity("15", player.setColor(Color.WHITE)
-//          ,Player.Stockfish(15)));
-//    });
   }
 
   public void createUniqueRoom(Context context) {
@@ -161,4 +169,9 @@ public class RoomActivity extends NoBackGestureActivity {
 //    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
     startActivity(intent);
   }
+
+  private void clientIconClick(){
+    takePicture.launch(null);
+  }
+
 }

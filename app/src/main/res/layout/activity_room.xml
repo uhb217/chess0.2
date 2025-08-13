@@ -6,18 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".RoomActivity">
 
-    <!-- Top player info -->
     <LinearLayout
         android:id="@+id/topPlayerInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
         android:background="@drawable/player_info_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -66,26 +65,33 @@
             android:textSize="18sp" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/board"
+    <!-- Replace the current board section with this -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="0dp"
-        android:layout_weight="1"
-        android:scaleType="fitCenter"
-        android:src="@drawable/filled_board" />
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="8dp">
 
-    <!-- Bottom player info (moved between board and text edit) -->
+        <ImageView
+            android:id="@+id/board"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/filled_board"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <LinearLayout
         android:id="@+id/bottomPlayerInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/player_info_bg"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -96,7 +102,9 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="12dp"
+            android:scaleType="centerCrop"
             android:background="@drawable/circle_bg"
+            android:clipToOutline="true"
             android:src="@drawable/ic_player" />
 
         <LinearLayout
@@ -138,13 +146,11 @@
         android:id="@+id/play_vs_stockfish"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:foreground="@drawable/ripple_effect"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/rounded_lottie_bg"
-        android:clipToOutline="true">
+        android:clipToOutline="true"
+        android:foreground="@drawable/ripple_effect">
 
         <com.airbnb.lottie.LottieAnimationView
             android:layout_width="match_parent"
@@ -168,10 +174,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/room_code_edit"
@@ -182,7 +188,7 @@
             android:background="@drawable/edit_text_bg"
             android:hint="Enter room code"
             android:maxLength="6"
-            android:padding="10dp"
+            android:padding="12dp"
             android:textColor="#FFFFFF"
             android:textColorHint="#FFFFFF" />
 
@@ -191,8 +197,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/primaryColor"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+            android:paddingHorizontal="20dp"
             android:text="Join"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
@@ -202,13 +207,10 @@
         android:id="@+id/create_room_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
         android:backgroundTint="@color/primaryColor"
         android:text="create room"
         android:textSize="20sp" />
-
 
 </LinearLayout>

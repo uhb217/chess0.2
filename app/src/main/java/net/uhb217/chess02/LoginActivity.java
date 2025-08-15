@@ -3,6 +3,7 @@ package net.uhb217.chess02;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -61,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
               waitingDialog.dismiss();
               username.setError("Invalid username or password");
               password.setError("Invalid username or password");
+              Log.e("FireBase Auth", e.getMessage());
             });
       }
     });

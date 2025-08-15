@@ -1,49 +1,204 @@
 package net.uhb217.chess02;
+//
+//import android.annotation.SuppressLint;
+//import android.content.Context;
+//import android.content.Intent;
+//import android.os.Bundle;
+//import android.provider.MediaStore;
+//import android.util.Log;
+//import android.widget.Button;
+//import android.widget.EditText;
+//import android.widget.FrameLayout;
+//import android.widget.ImageView;
+//import android.widget.Toast;
+//
+//import androidx.activity.EdgeToEdge;
+//import androidx.activity.result.ActivityResultLauncher;
+//import androidx.activity.result.contract.ActivityResultContracts;
+//import androidx.core.graphics.Insets;
+//import androidx.core.view.ViewCompat;
+//import androidx.core.view.WindowInsetsCompat;
+//
+//import com.google.firebase.auth.FirebaseAuth;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
+//
+//import net.uhb217.chess02.ui.PlayerInfoView;
+//import net.uhb217.chess02.ux.Player;
+//import net.uhb217.chess02.ux.utils.Color;
+//import net.uhb217.chess02.ui.Dialogs;
+//import net.uhb217.chess02.ux.utils.FirebaseUtils;
+//import net.uhb217.chess02.ux.utils.MoveHistory;
+//
+//import java.util.Random;
+//
+//public class RoomActivity extends NoBackGestureActivity {
+//  Button createRoomButton, joinButton;
+//  FrameLayout playVSStockfish;
+//  EditText roomIdInput;
+//  ImageView clientIcon;
+//  private boolean triggered = false;
+//  private ActivityResultLauncher<Void> takePicture;
+//
+//
+//  @SuppressLint("ClickableViewAccessibility")
+//  @Override
+//  protected void onCreate(Bundle savedInstanceState) {
+//    MoveHistory.INSTANCE.clear();
+//    super.onCreate(savedInstanceState);
+//    EdgeToEdge.enable(this);
+//    setContentView(R.layout.activity_room);
+//    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//      v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//      return insets;
+//    });
+//
+//
+//
+//    createRoomButton = findViewById(R.id.create_room_button);
+//    joinButton = findViewById(R.id.join_button);
+//    roomIdInput = findViewById(R.id.room_code_edit);
+//    clientIcon = findViewById(R.id.player_bottom_icon);
+//
+//    takePicture = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), clientIcon::setImageBitmap);
+//
+//    clientIcon.setOnClickListener(view -> clientIconClick());
+//
+//    Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
+//      if (player != null)
+//        PlayerInfoView.overrideXMLPlayerInfoView(findViewById(R.id.bottomPlayerInfo), player);
+//      else
+//        Log.e("Player", "Failed to fetch player data");
+//    });
+//
+//    createRoomButton.setOnClickListener(view -> createUniqueRoom(this));
+//    joinButton.setOnClickListener(v -> {
+//      String roomId = roomIdInput.getText().toString().trim().toUpperCase();
+//
+//      if (roomId.isEmpty()) {
+//        roomIdInput.setError("Room ID cannot be empty");
+//        return;
+//      }
+//
+//      DatabaseReference roomRef = FirebaseDatabase.getInstance()
+//          .getReference("rooms").child(roomId);
+//      roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+//        if (!snapshot.exists()) {
+//          roomIdInput.setError("Room does not exist");
+//          return;
+//        }
+//        Player player1 = snapshot.child("player1").getValue(Player.class);
+//        Player player2 = snapshot.child("player2").getValue(Player.class);
+//        if (player2 != null || player1 == null ) {
+//          roomIdInput.setError("Room is already full or closed");
+//          return;
+//        }
+//
+//        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
+//          player.setColor(player1.getColor().opposite());
+//          roomRef.child("player2").setValue(player)
+//              .addOnSuccessListener(unused -> startGameActivity(roomId, player, player1));
+//        });
+//      }));
+//    });
+//    playVSStockfish = findViewById(R.id.play_vs_stockfish);
+//    playVSStockfish.setOnClickListener(view -> Dialogs.INSTANCE.stockfishDialog(this
+//        ,()-> Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
+//            ,player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
+//                ,Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))));
+//  }
+//
+//  public void createUniqueRoom(Context context) {
+//    tryGenerateRoom(context, 0);
+//  }
+//
+//  private void tryGenerateRoom(Context context, int attempts) {
+//    if (attempts >= 5) {
+//      Toast.makeText(context, "Failed to create room. Try again.", Toast.LENGTH_SHORT).show();
+//      return;
+//    }
+//
+//    String roomId = generateRoomId();
+//    DatabaseReference roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
+//
+//    roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+//      if (snapshot.exists())// Retry if room already exists
+//        tryGenerateRoom(context, attempts + 1);
+//      else {
+//        Dialogs.INSTANCE.showWaitingDialog(context, roomId, roomRef::removeValue);
+//        // Room is safe to create
+//        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
+//          if (player != null) {
+//            player.setColor(new Random().nextBoolean() ? Color.WHITE : Color.BLACK);
+//            roomRef.child("player1").setValue(player);
+//
+//            roomRef.child("player2").addValueEventListener(FirebaseUtils.ValueListener(snapshot1 -> {
+//              Log.d("RoomActivity", "Player2 data changed: " + snapshot1.getValue());
+//              if (!triggered && snapshot1.exists()) {
+//                triggered = true;
+//                startGameActivity(roomId, player, snapshot1.getValue(Player.class));
+//              }
+//            }));
+//          } else {
+//            Log.e("Player", "Failed to fetch player data");
+//            Dialogs.INSTANCE.dismissWaitingDialog();
+//          }
+//        });
+//      }
+//    }));
+//  }
+//
+//  private static String generateRoomId() {
+//    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//    StringBuilder id = new StringBuilder();
+//    Random random = new Random();
+//
+//    for (int i = 0; i < 6; i++) {
+//      id.append(chars.charAt(random.nextInt(chars.length())));
+//    }
+//
+//    return id.toString(); // e.g., "G2K9X7"
+//  }
+//
+//  private void startGameActivity(String roomId, Player mainPlayer, Player opponentPlayer) {
+//    Intent intent = new Intent(this, MainActivity.class);
+//    intent.putExtra("mainPlayer", mainPlayer);
+//    intent.putExtra("opponentPlayer", opponentPlayer);
+//    intent.putExtra("roomId", roomId);
+//    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//    startActivity(intent);
+//  }
+//  private void clientIconClick(){
+//    takePicture.launch(null);
+//  }
+//
+//}
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.android.material.tabs.TabLayout;
 
-import net.uhb217.chess02.ui.PlayerInfoView;
-import net.uhb217.chess02.ux.Player;
-import net.uhb217.chess02.ux.utils.Color;
-import net.uhb217.chess02.ui.Dialogs;
-import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.MoveHistory;
 
-import java.util.Random;
+import org.jetbrains.annotations.Nullable;
 
-public class RoomActivity extends NoBackGestureActivity {
-  Button createRoomButton, joinButton;
-  FrameLayout playVSStockfish;
-  EditText roomIdInput;
-  ImageView clientIcon;
-  private boolean triggered = false;
-  private ActivityResultLauncher<Void> takePicture;
-
-
-  @SuppressLint("ClickableViewAccessibility")
+public class RoomActivity extends NoBackGestureActivity{
+  Adapter adapter;
+  ViewPager2 view;
+  TabLayout tabLayout;
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
     MoveHistory.INSTANCE.clear();
     super.onCreate(savedInstanceState);
     EdgeToEdge.enable(this);
@@ -54,124 +209,45 @@ public class RoomActivity extends NoBackGestureActivity {
       return insets;
     });
 
-
-
-    createRoomButton = findViewById(R.id.create_room_button);
-    joinButton = findViewById(R.id.join_button);
-    roomIdInput = findViewById(R.id.room_code_edit);
-    clientIcon = findViewById(R.id.player_bottom_icon);
-
-    takePicture = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), clientIcon::setImageBitmap);
-
-    clientIcon.setOnClickListener(view -> clientIconClick());
-
-    Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
-      if (player != null)
-        PlayerInfoView.overrideXMLPlayerInfoView(findViewById(R.id.bottomPlayerInfo), player);
-      else
-        Log.e("Player", "Failed to fetch player data");
-    });
-
-    createRoomButton.setOnClickListener(view -> createUniqueRoom(this));
-    joinButton.setOnClickListener(v -> {
-      String roomId = roomIdInput.getText().toString().trim().toUpperCase();
-
-      if (roomId.isEmpty()) {
-        roomIdInput.setError("Room ID cannot be empty");
-        return;
+    adapter = new Adapter(this);
+    view = findViewById(R.id.fragment_view);
+    view.setAdapter(adapter);
+    tabLayout = findViewById(R.id.tab_layout);
+    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+      @Override
+      public void onTabSelected(TabLayout.Tab tab) {
+        view.setCurrentItem(tab.getPosition());
       }
-
-      DatabaseReference roomRef = FirebaseDatabase.getInstance()
-          .getReference("rooms").child(roomId);
-      roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
-        if (!snapshot.exists()) {
-          roomIdInput.setError("Room does not exist");
-          return;
-        }
-        Player player1 = snapshot.child("player1").getValue(Player.class);
-        Player player2 = snapshot.child("player2").getValue(Player.class);
-        if (player2 != null || player1 == null ) {
-          roomIdInput.setError("Room is already full or closed");
-          return;
-        }
-
-        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
-          player.setColor(player1.getColor().opposite());
-          roomRef.child("player2").setValue(player)
-              .addOnSuccessListener(unused -> startGameActivity(roomId, player, player1));
-        });
-      }));
+      @Override
+      public void onTabUnselected(TabLayout.Tab tab) {
+      }
+      @Override
+      public void onTabReselected(TabLayout.Tab tab) {
+      }
     });
-    playVSStockfish = findViewById(R.id.play_vs_stockfish);
-    playVSStockfish.setOnClickListener(view -> Dialogs.INSTANCE.stockfishDialog(this
-        ,()-> Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
-            ,player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
-                ,Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))));
+    view.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+      @Override
+      public void onPageSelected(int position) {
+        super.onPageSelected(position);
+        tabLayout.getTabAt(position).select();
+      }
+    });
   }
+  private class Adapter extends FragmentStateAdapter {
 
-  public void createUniqueRoom(Context context) {
-    tryGenerateRoom(context, 0);
-  }
-
-  private void tryGenerateRoom(Context context, int attempts) {
-    if (attempts >= 5) {
-      Toast.makeText(context, "Failed to create room. Try again.", Toast.LENGTH_SHORT).show();
-      return;
+    public Adapter(@NonNull FragmentActivity fragmentActivity) {
+      super(fragmentActivity);
     }
 
-    String roomId = generateRoomId();
-    DatabaseReference roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
-
-    roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
-      if (snapshot.exists())// Retry if room already exists
-        tryGenerateRoom(context, attempts + 1);
-      else {
-        Dialogs.INSTANCE.showWaitingDialog(context, roomId, roomRef::removeValue);
-        // Room is safe to create
-        Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
-          if (player != null) {
-            player.setColor(new Random().nextBoolean() ? Color.WHITE : Color.BLACK);
-            roomRef.child("player1").setValue(player);
-
-            roomRef.child("player2").addValueEventListener(FirebaseUtils.ValueListener(snapshot1 -> {
-              Log.d("RoomActivity", "Player2 data changed: " + snapshot1.getValue());
-              if (!triggered && snapshot1.exists()) {
-                triggered = true;
-                startGameActivity(roomId, player, snapshot1.getValue(Player.class));
-              }
-            }));
-          } else {
-            Log.e("Player", "Failed to fetch player data");
-            Dialogs.INSTANCE.dismissWaitingDialog();
-          }
-        });
-      }
-    }));
-  }
-
-  private static String generateRoomId() {
-    String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    StringBuilder id = new StringBuilder();
-    Random random = new Random();
-
-    for (int i = 0; i < 6; i++) {
-      id.append(chars.charAt(random.nextInt(chars.length())));
+    @NonNull
+    @Override
+    public Fragment createFragment(int position) {
+      return position == 0? new RoomFragment(): new LeaderboardFragment();
     }
 
-    return id.toString(); // e.g., "G2K9X7"
+    @Override
+    public int getItemCount() {
+      return 2;
+    }
   }
-
-  private void startGameActivity(String roomId, Player mainPlayer, Player opponentPlayer) {
-    Intent intent = new Intent(this, MainActivity.class);
-    intent.putExtra("mainPlayer", mainPlayer);
-    intent.putExtra("opponentPlayer", opponentPlayer);
-    intent.putExtra("roomId", roomId);
-//    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-    startActivity(intent);
-  }
-
-  private void clientIconClick(){
-    takePicture.launch(null);
-  }
-
 }

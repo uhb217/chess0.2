@@ -6,211 +6,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:gravity="center"
     android:orientation="vertical"
     tools:context=".RoomActivity">
 
-    <LinearLayout
-        android:id="@+id/topPlayerInfo"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/fragment_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/player_info_bg"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:background="@drawable/rounded_bg"
+        app:tabIconTint="@color/buttonColor"
+        app:tabIndicatorColor="#428E45"
+        app:tabSelectedTextColor="#4CAF50"
+        app:tabTextColor="#B34CAF50">
 
-        <ImageView
-            android:id="@+id/player_top_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_bg"
-            android:src="@drawable/ic_player" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/player_top_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Opponent"
-                android:textColor="#FFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/player_top_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1500"
-                android:textColor="#FFF"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/player_top_time"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/time_bg"
-            android:padding="8dp"
-            android:text="10:00"
-            android:textColor="#FFF"
-            android:textSize="18sp" />
-    </LinearLayout>
+            android:icon="@drawable/ic_player"
+            android:text="Play" />
 
-    <!-- Replace the current board section with this -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="8dp">
-
-        <ImageView
-            android:id="@+id/board"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/filled_board"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <LinearLayout
-        android:id="@+id/bottomPlayerInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/player_info_bg"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="12dp">
-
-        <ImageView
-            android:id="@+id/player_bottom_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="12dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/circle_bg"
-            android:clipToOutline="true"
-            android:src="@drawable/ic_player" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/player_bottom_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Player 2"
-                android:textColor="#FFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/player_bottom_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1500"
-                android:textColor="#FFF"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/player_bottom_time"
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/time_bg"
-            android:padding="8dp"
-            android:text="10:00"
-            android:textColor="#FFF"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/play_vs_stockfish"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="24dp"
-        android:background="@drawable/rounded_lottie_bg"
-        android:clipToOutline="true"
-        android:foreground="@drawable/ripple_effect">
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            app:lottie_autoPlay="true"
-            app:lottie_fileName="moving_gradient.json"
-            app:lottie_loop="true" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#00000000"
-            android:gravity="center"
-            android:text="Play VS Stockfish"
-            android:textAlignment="center"
-            android:textColor="#FFF"
-            android:textSize="30sp" />
-    </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/room_code_edit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/edit_text_bg"
-            android:hint="Enter room code"
-            android:maxLength="6"
-            android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#FFFFFF" />
-
-        <Button
-            android:id="@+id/join_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/primaryColor"
-            android:paddingHorizontal="20dp"
-            android:text="Join"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/create_room_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/primaryColor"
-        android:text="create room"
-        android:textSize="20sp" />
+            android:icon="@drawable/baseline_leaderboard_24"
+            android:text="Leaderboard" />
+    </com.google.android.material.tabs.TabLayout>
 
 </LinearLayout>

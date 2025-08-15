@@ -1,5 +1,9 @@
 package net.uhb217.chess02.ux;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -12,26 +16,28 @@ import java.io.Serializable;
 public class Player implements Serializable {
   public final String username;
   public int rating = 1600; // Default rating
-  public int timeSeconds;
   private Color color;
+  public String base64encodedIcon;
+
   public Player() {
     username = null;
   }
 
 
-  public Player(String username, int rating, Color color) {
+  public Player(String username, int rating, Color color, String base64encodedIcon) {
     this.username = username;
     this.rating = rating;
     this.color = color;
-    this.timeSeconds = 10 * 60; // Default time
+    this.base64encodedIcon = base64encodedIcon;
+  }
+  public Player(String username, int rating, String base64encodedIcon) {
+    this(username, rating, null, base64encodedIcon);
   }
 
   public Player(String username, int rating) {
-    this.username = username;
-    this.rating = rating;
-    this.color = null;
-
+    this(username, rating, null, null);
   }
+
   public static Player Stockfish(int depth) {
     int rating;
     if (depth <= 0) rating = 0;
@@ -44,35 +50,31 @@ public class Player implements Serializable {
     } else {
       rating = 2850 + (depth - 20) * 25;
     }
-    return new Player("Stockfish", rating, Color.BLACK);
+    return new Player("Stockfish", rating, Color.BLACK, null);
   }
 
-  public String getTimeString() {
-    int minutes = timeSeconds / 60;
-    int seconds = timeSeconds % 60;
-    return String.format("%02d:%02d", minutes, seconds);
-  }
   public static void fromFirebaseUsername(String username, PlayerCallback callback) {
-      DatabaseReference ref = FirebaseDatabase.getInstance()
-              .getReference("users")
-              .child(username);
-      ref.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
-        if (!snapshot.exists()) {
-          callback.onPlayerFetched(null);
-          return;
-        }
+    DatabaseReference ref = FirebaseDatabase.getInstance()
+        .getReference("users")
+        .child(username);
+    ref.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+      if (!snapshot.exists()) {
+        callback.onPlayerFetched(null);
+        return;
+      }
 
-        Integer rating = snapshot.child("rating").getValue(Integer.class);
+      Integer rating = snapshot.child("rating").getValue(Integer.class);
 
-        if (rating == null) {
-          callback.onPlayerFetched(null);
-          return;
-        }
+      if (rating == null) {
+        callback.onPlayerFetched(null);
+        return;
+      }
 
-        Player player = new Player(username, rating);
-        callback.onPlayerFetched(player);
-      }));
+      Player player = new Player(username, rating);
+      callback.onPlayerFetched(player);
+    }));
   }
+
   public static void fromFirebaseUser(FirebaseUser user, PlayerCallback callback) {
     if (user == null) {
       callback.onPlayerFetched(null);
@@ -81,7 +83,7 @@ public class Player implements Serializable {
     fromFirebaseUsername(user.getDisplayName(), callback);
   }
 
-  public void updateRating(int opponentRating, int gameStatus){
+  public void updateRating(int opponentRating, int gameStatus) {
     int toAdd = 16 * (gameStatus - (1 / (1 + 10 ^ (opponentRating - rating))));
 
     int newRating = rating + toAdd;
@@ -98,7 +100,14 @@ public class Player implements Serializable {
     return this;
   }
 
-    public Color getColor() {
-        return color;
-    }
+  public Color getColor() {
+    return color;
+  }
+
+  public Bitmap getIconBitmap() {
+    if (base64encodedIcon == null)
+      return null;
+    byte[] decodedString = Base64.decode(base64encodedIcon, Base64.DEFAULT);
+    return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+  }
 }

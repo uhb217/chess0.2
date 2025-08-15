@@ -1,7 +1,10 @@
 package net.uhb217.chess02.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -43,6 +46,9 @@ public class PlayerInfoView extends LinearLayout {
     playerIcon.setLayoutParams(iconParams);
     if (player.username.equals("Stockfish"))
       playerIcon.setImageResource(R.drawable.stockfish);
+    else if(player.getIconBitmap() != null)
+      playerIcon.setImageBitmap(player.getIconBitmap());
+
     else
       playerIcon.setImageResource(R.drawable.ic_player);
     playerIcon.setBackground(ContextCompat.getDrawable(ctx, R.drawable.circle_bg));
@@ -126,7 +132,6 @@ public class PlayerInfoView extends LinearLayout {
     LinearLayout nameRating = (LinearLayout) frame.getChildAt(1);
     ((TextView) nameRating.getChildAt(0)).setText(player.username);
     ((TextView) nameRating.getChildAt(1)).setText(String.valueOf(player.rating));
-    ((TextView) frame.getChildAt(2)).setText("10:00"); // Default time, can be updated later
-
+    ((ImageView) frame.getChildAt(0)).setImageBitmap(player.getIconBitmap());
   }
 }

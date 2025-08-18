@@ -49,8 +49,8 @@ public class MainActivity extends NoBackGestureActivity {
     else
       board = new Board(this, mainPlayer.getColor(),getIntent().getStringExtra("roomId"));
 
-    topPlayerInfoView = new PlayerInfoView(this, opponentPlayer, againstStockfish);
-    bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer, againstStockfish);
+    topPlayerInfoView = new PlayerInfoView(this, opponentPlayer);
+    bottomPlayerInfoView = new PlayerInfoView(this, mainPlayer);
 
     topPlayerInfoView.setId(R.id.top_player_info_view);
     bottomPlayerInfoView.setId(R.id.bottom_player_info_view);

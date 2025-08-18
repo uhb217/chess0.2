@@ -34,7 +34,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_bg"
+                android:background="@drawable/squircle_bg"
                 android:src="@drawable/ic_player" />
 
             <LinearLayout
@@ -108,7 +108,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="12dp"
-                android:background="@drawable/circle_bg"
+                android:background="@drawable/squircle_bg"
                 android:clipToOutline="true"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_player" />

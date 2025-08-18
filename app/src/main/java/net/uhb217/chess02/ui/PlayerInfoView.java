@@ -1,10 +1,7 @@
 package net.uhb217.chess02.ui;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -17,10 +14,12 @@ import androidx.core.content.ContextCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.uhb217.chess02.R;
 import net.uhb217.chess02.ux.Player;
+import net.uhb217.chess02.ux.utils.FirebaseUtils;
 
 public class PlayerInfoView extends LinearLayout {
   private ImageView playerIcon;
@@ -28,7 +27,7 @@ public class PlayerInfoView extends LinearLayout {
   private TextView playerRating;
   private TextView playerTime;
 
-  public PlayerInfoView(Context ctx, Player player, boolean againstStockfish) {
+  public PlayerInfoView(Context ctx, Player player) {
     super(ctx);
     setOrientation(HORIZONTAL);
     setGravity(Gravity.CENTER_VERTICAL);
@@ -44,6 +43,8 @@ public class PlayerInfoView extends LinearLayout {
     LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(ctx, 40), dp(ctx, 40));
     iconParams.setMarginEnd(dp(ctx, 12));
     playerIcon.setLayoutParams(iconParams);
+    playerIcon.setClipToOutline(true);
+    playerIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
     if (player.username.equals("Stockfish"))
       playerIcon.setImageResource(R.drawable.stockfish);
     else if(player.getIconBitmap() != null)
@@ -51,7 +52,7 @@ public class PlayerInfoView extends LinearLayout {
 
     else
       playerIcon.setImageResource(R.drawable.ic_player);
-    playerIcon.setBackground(ContextCompat.getDrawable(ctx, R.drawable.circle_bg));
+    playerIcon.setBackground(ContextCompat.getDrawable(ctx, R.drawable.squircle_bg));
     addView(playerIcon);
 
     // Name and Rating
@@ -112,15 +113,19 @@ public class PlayerInfoView extends LinearLayout {
     return Integer.parseInt(playerRating.getText().toString());
   }
 
-  public void updateRating(int opponentRating, double gameStatus) {
+  public void updatePlayerStats(int opponentRating, double gameStatus) {
     int toAdd = (int) Math.round(16 * (gameStatus - 1.0 / (1 + Math.pow(10, (opponentRating - getRating()) / 400.0))));
 
     int newRating = getRating() + toAdd;
-    // Only update if the username matches the current user's username
 
     String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-    FirebaseDatabase.getInstance().getReference("users")
-        .child(currentUserName).child("rating").setValue(newRating);
+    DatabaseReference ref =  FirebaseDatabase.getInstance().getReference("users").child(currentUserName);
+    ref.child("rating").setValue(newRating);
+    String value2update = gameStatus == 1 ? "wins" : gameStatus == 0 ? "losses" : "draws";
+    ref.child(value2update).addListenerForSingleValueEvent(FirebaseUtils.valueListener(value -> {
+      if (value.exists())
+        ref.child(value2update).setValue(value.getValue(Integer.class) + 1);
+    }));
 
 
     String score = toAdd > 0 ? " +" + toAdd : " -" + -toAdd;
@@ -132,6 +137,7 @@ public class PlayerInfoView extends LinearLayout {
     LinearLayout nameRating = (LinearLayout) frame.getChildAt(1);
     ((TextView) nameRating.getChildAt(0)).setText(player.username);
     ((TextView) nameRating.getChildAt(1)).setText(String.valueOf(player.rating));
-    ((ImageView) frame.getChildAt(0)).setImageBitmap(player.getIconBitmap());
+    if (player.getIconBitmap() != null)
+      ((ImageView) frame.getChildAt(0)).setImageBitmap(player.getIconBitmap());
   }
 }

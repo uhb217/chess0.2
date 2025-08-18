@@ -30,7 +30,6 @@ import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Player;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
-import net.uhb217.chess02.ux.utils.MoveHistory;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
@@ -43,7 +42,8 @@ public class RoomFragment extends Fragment {
   private boolean triggered = false;
   private ActivityResultLauncher<Void> takePicture;
 
-  public RoomFragment() { }
+  public RoomFragment() {
+  }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,7 +61,7 @@ public class RoomFragment extends Fragment {
     roomIdInput = view.findViewById(R.id.room_code_edit);
     clientIcon = view.findViewById(R.id.player_bottom_icon);
 
-    takePicture = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), bitmap -> clientIconClick(bitmap));
+    takePicture = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), this::clientIconClick);
 
     clientIcon.setOnClickListener(v -> takePicture.launch(null));
 
@@ -83,7 +83,7 @@ public class RoomFragment extends Fragment {
 
       DatabaseReference roomRef = FirebaseDatabase.getInstance()
           .getReference("rooms").child(roomId);
-      roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+      roomRef.addListenerForSingleValueEvent(FirebaseUtils.valueListener(snapshot -> {
         if (!snapshot.exists()) {
           roomIdInput.setError("Room does not exist");
           return;
@@ -122,7 +122,7 @@ public class RoomFragment extends Fragment {
     String roomId = generateRoomId();
     DatabaseReference roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
 
-    roomRef.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+    roomRef.addListenerForSingleValueEvent(FirebaseUtils.valueListener(snapshot -> {
       if (snapshot.exists())// Retry if room already exists
         tryGenerateRoom(context, attempts + 1);
       else {
@@ -133,7 +133,7 @@ public class RoomFragment extends Fragment {
             player.setColor(new Random().nextBoolean() ? Color.WHITE : Color.BLACK);
             roomRef.child("player1").setValue(player);
 
-            roomRef.child("player2").addValueEventListener(FirebaseUtils.ValueListener(snapshot1 -> {
+            roomRef.child("player2").addValueEventListener(FirebaseUtils.valueListener(snapshot1 -> {
               Log.d("RoomActivity", "Player2 data changed: " + snapshot1.getValue());
               if (!triggered && snapshot1.exists()) {
                 triggered = true;
@@ -168,16 +168,16 @@ public class RoomFragment extends Fragment {
     intent.putExtra("roomId", roomId);
     startActivity(intent);
   }
-    private void clientIconClick(Bitmap bitmap){
-      clientIcon.setImageBitmap(bitmap);
 
-      ByteArrayOutputStream boas = new ByteArrayOutputStream();
-      bitmap.compress(Bitmap.CompressFormat.PNG, 100, boas);
-      String base64encoded = Base64.encodeToString(boas.toByteArray(), Base64.DEFAULT);
+  private void clientIconClick(Bitmap bitmap) {
+    clientIcon.setImageBitmap(bitmap);
 
+    ByteArrayOutputStream boas = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, boas);
+    String base64encoded = Base64.encodeToString(boas.toByteArray(), Base64.DEFAULT);
 
-      String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-      FirebaseDatabase.getInstance().getReference("users").child(username).child("icon").setValue(base64encoded)
-          .addOnSuccessListener(unused -> Toast.makeText(getContext(), "Icon saved", Toast.LENGTH_SHORT).show());
+    String username = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+    FirebaseDatabase.getInstance().getReference("users").child(username).child("base64encodedIcon").setValue(base64encoded)
+        .addOnSuccessListener(unused -> Toast.makeText(getContext(), "Icon saved", Toast.LENGTH_SHORT).show());
   }
 }

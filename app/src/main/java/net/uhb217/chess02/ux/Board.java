@@ -50,7 +50,7 @@ public class Board extends FrameLayout {
   public int halfMoves = 0; // Halfmove clock for fifty-move rule
   public final DatabaseReference db;
   private final int depth;
-  private final ValueEventListener resignValueListener = FirebaseUtils.ValueListener(snapshot -> {
+  private final ValueEventListener resignValueListener = FirebaseUtils.valueListener(snapshot -> {
     if (snapshot.exists()) gameOverCleanup(color, "Resignation");
   });
 
@@ -279,7 +279,7 @@ public class Board extends FrameLayout {
     if (db == null)
       throw new IllegalStateException("Database reference is not initialized.");
 
-    db.child("moves").addValueEventListener(FirebaseUtils.ValueListener(snapshot -> {
+    db.child("moves").addValueEventListener(FirebaseUtils.valueListener(snapshot -> {
       if (snapshot.exists()) {
         List<String> moves = new ArrayList<>();
         for (DataSnapshot child : snapshot.getChildren())
@@ -292,7 +292,7 @@ public class Board extends FrameLayout {
       }
     }));
     db.child("resign").addValueEventListener(resignValueListener);
-    db.child("draw").addValueEventListener(FirebaseUtils.ValueListener(snapshot -> {
+    db.child("draw").addValueEventListener(FirebaseUtils.valueListener(snapshot -> {
       if (snapshot.exists()) {
         int value = snapshot.getValue(Integer.class);
         if (value == 1 && !isDrawOffered)
@@ -418,8 +418,7 @@ public class Board extends FrameLayout {
       y += increment;
     }
 
-    // Set turn color
-    turnColor = fenParts[1].equals("w") ? WHITE : BLACK;
+    // doesnt Set turn color because its not changing the game game state, only the view
     // Handle castling rights if present. if both option to
     King whiteKing = getKing(WHITE);
     King blackKing = getKing(BLACK);
@@ -468,7 +467,7 @@ public class Board extends FrameLayout {
       PlayerInfoView top = activity.findViewById(R.id.top_player_info_view);
       PlayerInfoView bottom = activity.findViewById(R.id.bottom_player_info_view);
       double gameStatus = winner == null ? 0.5 : winner == color ? 1 : 0;
-      bottom.updateRating(top.getRating(), gameStatus);
+      bottom.updatePlayerStats(top.getRating(), gameStatus);
     }
 
     Dialogs.INSTANCE.showGameOverDialog(getContext(), winner, reason);

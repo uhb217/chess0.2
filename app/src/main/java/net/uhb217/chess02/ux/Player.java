@@ -14,7 +14,7 @@ import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import java.io.Serializable;
 
 public class Player implements Serializable {
-  public final String username;
+  public String username;
   public int rating = 1600; // Default rating
   private Color color;
   public String base64encodedIcon;
@@ -57,20 +57,17 @@ public class Player implements Serializable {
     DatabaseReference ref = FirebaseDatabase.getInstance()
         .getReference("users")
         .child(username);
-    ref.addListenerForSingleValueEvent(FirebaseUtils.ValueListener(snapshot -> {
+    ref.addListenerForSingleValueEvent(FirebaseUtils.valueListener(snapshot -> {
       if (!snapshot.exists()) {
         callback.onPlayerFetched(null);
         return;
       }
-
-      Integer rating = snapshot.child("rating").getValue(Integer.class);
-
-      if (rating == null) {
+      Player player = snapshot.getValue(Player.class);
+      if (player == null) {
         callback.onPlayerFetched(null);
         return;
       }
-
-      Player player = new Player(username, rating);
+      player.username = username;
       callback.onPlayerFetched(player);
     }));
   }
@@ -81,14 +78,6 @@ public class Player implements Serializable {
       return;
     }
     fromFirebaseUsername(user.getDisplayName(), callback);
-  }
-
-  public void updateRating(int opponentRating, int gameStatus) {
-    int toAdd = 16 * (gameStatus - (1 / (1 + 10 ^ (opponentRating - rating))));
-
-    int newRating = rating + toAdd;
-    FirebaseDatabase.getInstance().getReference("players").child(username)
-        .child("rating").setValue(newRating);
   }
 
   public interface PlayerCallback {

@@ -38,7 +38,7 @@ public class Player implements Serializable {
     this(username, rating, null, null);
   }
 
-  public static Player Stockfish(int depth) {
+  public static Player Stockfish(int depth, Color color) {
     int rating;
     if (depth <= 0) rating = 0;
 
@@ -50,7 +50,7 @@ public class Player implements Serializable {
     } else {
       rating = 2850 + (depth - 20) * 25;
     }
-    return new Player("Stockfish", rating, Color.BLACK, null);
+    return new Player("Stockfish", rating, color, null);
   }
 
   public static void fromFirebaseUsername(String username, PlayerCallback callback) {

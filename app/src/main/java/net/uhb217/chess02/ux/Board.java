@@ -30,7 +30,7 @@ import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ui.Dialogs;
 import net.uhb217.chess02.ux.utils.FirebaseUtils;
 import net.uhb217.chess02.ux.utils.MoveHistory;
-import net.uhb217.chess02.ux.utils.Point;
+import net.uhb217.chess02.ux.utils.Marker;
 import net.uhb217.chess02.ux.utils.Pos;
 import net.uhb217.chess02.ux.utils.StockfishApi;
 
@@ -433,7 +433,7 @@ public class Board extends FrameLayout {
   private void clearBoard() {
     //remove all points
     for (int i = 0; i < getChildCount(); i++)
-      if (getChildAt(i) instanceof Point)
+      if (getChildAt(i) instanceof Marker)
         removeViewAt(i--);
     // Remove all pieces from the board
     for (int rank = 0; rank < 8; rank++)

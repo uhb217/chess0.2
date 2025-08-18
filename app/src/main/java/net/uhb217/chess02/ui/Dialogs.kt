@@ -4,17 +4,22 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.RadioButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.graphics.drawable.toDrawable
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import net.uhb217.chess02.R
+import net.uhb217.chess02.RoomFragment
+import net.uhb217.chess02.ui.Dialogs.getStockfishElo
+import net.uhb217.chess02.ux.Player
+import net.uhb217.chess02.ux.Player.PlayerCallback
 import net.uhb217.chess02.ux.utils.Color
 
 object Dialogs {
@@ -174,12 +179,29 @@ object Dialogs {
         waitForDrawResponse?.dismiss()
     }
     private var stockfishElo: Int = 15
-    fun stockfishDialog(ctx: Context, onPress: Runnable){
+    fun stockfishDialog(ctx: Context){
         val dialog = TransparentDialog(ctx)
-        dialog.setContentView(R.layout.dialog_stockfish_elo)
+        dialog.setContentView(R.layout.dialog_stockfish_conf)
 
         dialog.findViewById<Button>(R.id.start_game).setOnClickListener {
-            onPress.run()
+            val isWhite = dialog.findViewById<RadioButton>(R.id.white_choice_radio).isChecked
+
+            Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), { player ->
+                player.color = if (isWhite) Color.WHITE else Color.BLACK
+                RoomFragment.startGameActivity(ctx, getStockfishElo().toString(), player
+                    ,Player.Stockfish(getStockfishElo(), player.color.opposite()))
+            })
+//            Player.fromFirebaseUser(
+//                FirebaseAuth.getInstance().getCurrentUser(),
+//                PlayerCallback { player: Player? ->
+//                    startGameActivity(
+//                        getStockfishElo().toString(), player!!.setColor(Color.WHITE),
+//                        Player.Stockfish(getStockfishElo())
+//                    )
+//                })
+//            Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
+//            , player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
+//                , Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))
             dialog.dismiss()
         }
 

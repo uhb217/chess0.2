@@ -11,7 +11,7 @@ import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.utils.BoardUtils;
 import net.uhb217.chess02.ux.utils.Color;
 import net.uhb217.chess02.ux.utils.MoveHistory;
-import net.uhb217.chess02.ux.utils.Point;
+import net.uhb217.chess02.ux.utils.Marker;
 import net.uhb217.chess02.ux.utils.Pos;
 
 import java.util.List;
@@ -31,7 +31,9 @@ public abstract class Piece extends AppCompatImageView {
     setOnClickListener(this::onClick);
     setImageResource(resId());
   }
+
   public abstract char charCode();
+
   protected abstract int resId();
 
   public abstract List<Pos> getLegalMoves(Piece[][] boardPos);
@@ -40,14 +42,15 @@ public abstract class Piece extends AppCompatImageView {
     Board board = Board.getInstance();
     if (board.getTurnColor() == board.getColor() && board.getTurnColor() == color && !MoveHistory.INSTANCE.canMoveForward() && !board.isGameOver)
       return this instanceof King ? getLegalMoves(board.getBoard()) :
-        getLegalMoves(board.getBoard()).stream()
-            .filter(p -> !isPinnedToKing(p)).collect(Collectors.toList());
+          getLegalMoves(board.getBoard()).stream()
+              .filter(p -> !isPinnedToKing(p)).collect(Collectors.toList());
     return List.of();
   }
 
   /**
    * Checks if the piece has any legal moves for stalemates and mates.
    * Can`t use {@link #getLegalMoves()} because its returns only legal moves for the current player
+   *
    * @return true if the piece has any legal moves, false otherwise
    */
   public boolean hasLegalMoves() {
@@ -70,17 +73,16 @@ public abstract class Piece extends AppCompatImageView {
 
   protected void onClick(View view) {
     Board board = Board.getInstance();
+    removeAllPoints();
     if (board.getClickedPiece() != this) {
       //display legal moves by points
-      removeAllPoints();
       List<Pos> legalMoves = getLegalMoves();
       for (Pos legalMove : legalMoves)
-        board.addView(new Point(getContext(), legalMove, this));
+        board.addView(new Marker(getContext(), legalMove, this, false));
+      board.addView(new Marker(getContext(), pos, this, true));
       board.setClickedPiece(this);
-    } else {
-      removeAllPoints();
+    } else
       board.setClickedPiece(null);
-    }
   }
 
   protected void updatePos() {
@@ -88,10 +90,12 @@ public abstract class Piece extends AppCompatImageView {
     setY(pos.y * SIZE);
     setLayoutParams(new FrameLayout.LayoutParams(SIZE, SIZE));
   }
+
   public void move(Pos pos) {
     move(pos.x, pos.y);
   }
-  public void  move(int x, int y){
+
+  public void move(int x, int y) {
     move(x, y, false);//TODO: move tests
 //    move(x, y, false);
   }
@@ -100,8 +104,9 @@ public abstract class Piece extends AppCompatImageView {
    * Moves the piece to the specified position and updates the board state.
    * {@link Pawn} completely overrides this.
    * In {@link King} and {@link Rook} its with extra logic for castling.
-   * @param x the target x-coordinate
-   * @param y the target y-coordinate
+   *
+   * @param x        the target x-coordinate
+   * @param y        the target y-coordinate
    * @param bySystem whether to update the Firebase database with this move(recursion prevention)
    */
   public void move(int x, int y, boolean bySystem) {
@@ -118,6 +123,7 @@ public abstract class Piece extends AppCompatImageView {
 
   /**
    * Places the piece at the specified position on the board array and removes it from the old position.
+   *
    * @param x the target x-coordinate
    * @param y the target y-coordinate
    */
@@ -134,7 +140,7 @@ public abstract class Piece extends AppCompatImageView {
   protected void removeAllPoints() {
     Board board = Board.getInstance();
     for (int i = 0; i < board.getChildCount(); i++)
-      if (board.getChildAt(i) instanceof Point)
+      if (board.getChildAt(i) instanceof Marker)
         board.removeViewAt(i--);
   }
 }

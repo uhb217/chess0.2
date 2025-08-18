@@ -98,15 +98,12 @@ public class RoomFragment extends Fragment {
         Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), player -> {
           player.setColor(player1.getColor().opposite());
           roomRef.child("player2").setValue(player)
-              .addOnSuccessListener(unused -> startGameActivity(roomId, player, player1));
+              .addOnSuccessListener(unused -> startGameActivity(getContext(),roomId, player, player1));
         });
       }));
     });
     playVSStockfish = view.findViewById(R.id.play_vs_stockfish);
-    playVSStockfish.setOnClickListener(v -> Dialogs.INSTANCE.stockfishDialog(getContext()
-        , () -> Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
-            , player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
-                , Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))));
+    playVSStockfish.setOnClickListener(v -> Dialogs.INSTANCE.stockfishDialog(getContext()));
   }
 
   public void createUniqueRoom(Context context) {
@@ -137,7 +134,7 @@ public class RoomFragment extends Fragment {
               Log.d("RoomActivity", "Player2 data changed: " + snapshot1.getValue());
               if (!triggered && snapshot1.exists()) {
                 triggered = true;
-                startGameActivity(roomId, player, snapshot1.getValue(Player.class));
+                startGameActivity(getContext(),roomId, player, snapshot1.getValue(Player.class));
               }
             }));
           } else {
@@ -161,12 +158,12 @@ public class RoomFragment extends Fragment {
     return id.toString(); // e.g., "G2K9X7"
   }
 
-  private void startGameActivity(String roomId, Player mainPlayer, Player opponentPlayer) {
-    Intent intent = new Intent(getContext(), MainActivity.class);
+  public static void startGameActivity(Context ctx, String roomId, Player mainPlayer, Player opponentPlayer) {
+    Intent intent = new Intent(ctx, MainActivity.class);
     intent.putExtra("mainPlayer", mainPlayer);
     intent.putExtra("opponentPlayer", opponentPlayer);
     intent.putExtra("roomId", roomId);
-    startActivity(intent);
+    ctx.startActivity(intent);
   }
 
   private void clientIconClick(Bitmap bitmap) {

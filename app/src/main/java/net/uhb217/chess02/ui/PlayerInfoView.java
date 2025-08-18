@@ -42,6 +42,7 @@ public class PlayerInfoView extends LinearLayout {
     playerIcon = new ImageView(ctx);
     LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(ctx, 40), dp(ctx, 40));
     iconParams.setMarginEnd(dp(ctx, 12));
+    iconParams.leftMargin = dp(ctx, 5);
     playerIcon.setLayoutParams(iconParams);
     playerIcon.setClipToOutline(true);
     playerIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);

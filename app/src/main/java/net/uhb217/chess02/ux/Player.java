@@ -6,6 +6,7 @@ import android.util.Base64;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 
 import net.uhb217.chess02.ux.utils.Color;
@@ -93,6 +94,7 @@ public class Player implements Serializable {
     return color;
   }
 
+  @Exclude
   public Bitmap getIconBitmap() {
     if (base64encodedIcon == null)
       return null;

@@ -1,12 +1,11 @@
 package net.uhb217.chess02;
 
+import static net.uhb217.chess02.ux.utils.Color.WHITE;
+
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -17,7 +16,6 @@ import net.uhb217.chess02.ui.BottomGameControls;
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
-import net.uhb217.chess02.ux.utils.MoveHistory;
 
 public class MainActivity extends NoBackGestureActivity {
   private Board board;
@@ -38,8 +36,6 @@ public class MainActivity extends NoBackGestureActivity {
 
     mainPlayer = (Player) getIntent().getSerializableExtra("mainPlayer");
     opponentPlayer = (Player) getIntent().getSerializableExtra("opponentPlayer");
-//    mainPlayer = new Player("uhb217", 1600, Color.BLACK);
-//    opponentPlayer = new Player("Opponent", 1600, Color.BLACK);
 
     rootLayout = findViewById(R.id.board_container);
     String roomId = getIntent().getStringExtra("roomId");
@@ -54,6 +50,11 @@ public class MainActivity extends NoBackGestureActivity {
 
     topPlayerInfoView.setId(R.id.top_player_info_view);
     bottomPlayerInfoView.setId(R.id.bottom_player_info_view);
+
+    if (mainPlayer.getColor() == WHITE)
+      bottomPlayerInfoView.toggle();
+    else
+      topPlayerInfoView.toggle();
 
     rootLayout.addView(topPlayerInfoView);
     rootLayout.addView(board);

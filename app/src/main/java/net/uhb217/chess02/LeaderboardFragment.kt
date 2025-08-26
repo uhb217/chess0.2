@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
 import net.uhb217.chess02.ux.utils.FirebaseUtils
 
 class LeaderboardFragment : Fragment() {
@@ -48,7 +48,6 @@ class LeaderboardFragment : Fragment() {
         if (!::leaderboardContainer.isInitialized) return
         leaderboardContainer.removeAllViews()
         playersInfo.forEach { player ->
-            Log.d("LeaderboardFragment", "Player: ${player.name}, Rating: ${player.rating}")
             leaderboardContainer.addView(LeaderboardPlayerStatsItem(context, player))
         }
     }
@@ -75,7 +74,7 @@ class LeaderboardFragment : Fragment() {
                 bottomMargin = 4.dpToPx()
             }
             setPadding(12.dpToPx(), 12.dpToPx(), 12.dpToPx(), 12.dpToPx())
-            setBackgroundResource(R.drawable.player_info_bg)
+            setBackgroundResource(if (stats.name == FirebaseAuth.getInstance().currentUser?.displayName) R.drawable.bright_time_bg else R.drawable.player_info_bg)
 
             // Player icon
             playerIcon = ImageView(context).apply {

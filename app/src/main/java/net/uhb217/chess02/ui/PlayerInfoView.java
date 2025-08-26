@@ -26,6 +26,7 @@ public class PlayerInfoView extends LinearLayout {
   private TextView playerName;
   private TextView playerRating;
   private TextView playerTime;
+  private boolean toggled = false;
 
   public PlayerInfoView(Context ctx, Player player) {
     super(ctx);
@@ -105,11 +106,6 @@ public class PlayerInfoView extends LinearLayout {
   private int dp(Context ctx, int dp) {
     return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, ctx.getResources().getDisplayMetrics());
   }
-
-  public void setTime(String time) {
-    playerTime.setText(time);
-  }
-
   public int getRating() {
     return Integer.parseInt(playerRating.getText().toString());
   }
@@ -140,5 +136,12 @@ public class PlayerInfoView extends LinearLayout {
     ((TextView) nameRating.getChildAt(1)).setText(String.valueOf(player.rating));
     if (player.getIconBitmap() != null)
       ((ImageView) frame.getChildAt(0)).setImageBitmap(player.getIconBitmap());
+  }
+  public void toggle() {
+    if (toggled)
+      playerTime.setBackground(getContext().getDrawable(R.drawable.time_bg));
+    else
+      playerTime.setBackground(getContext().getDrawable(R.drawable.bright_time_bg));
+    toggled = !toggled;
   }
 }

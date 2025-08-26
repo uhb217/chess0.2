@@ -249,6 +249,9 @@ public class Board extends FrameLayout {
       gameOverCleanup(turnColor, gameOver);
     else {
       turnColor = turnColor.opposite();
+      Activity activity = (Activity) getContext();
+      ((PlayerInfoView) activity.findViewById(R.id.top_player_info_view)).toggle();
+      ((PlayerInfoView) activity.findViewById(R.id.bottom_player_info_view)).toggle();
       if (depth != -1 && !bySystem)
         StockfishApi.INSTANCE.playBestMove(toFEN(), depth, ((Activity) getContext()).findViewById(R.id.lottie));
     }

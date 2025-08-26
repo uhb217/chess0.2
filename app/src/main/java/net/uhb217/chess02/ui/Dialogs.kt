@@ -17,9 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import net.uhb217.chess02.R
 import net.uhb217.chess02.RoomFragment
-import net.uhb217.chess02.ui.Dialogs.getStockfishElo
 import net.uhb217.chess02.ux.Player
-import net.uhb217.chess02.ux.Player.PlayerCallback
 import net.uhb217.chess02.ux.utils.Color
 
 object Dialogs {
@@ -100,13 +98,13 @@ object Dialogs {
         dialog.show()
     }
 
-    private var waitingDialog: AlertDialog? = null
+    private var waitingDialog: TransparentDialog? = null
 
     fun showWaitingDialog(ctx: Context, roomId: String, onCancel: Runnable): Dialog {
-        val dialog = TransparentDialog(ctx)
+        waitingDialog = TransparentDialog(ctx)
         val view = LayoutInflater.from(ctx).inflate(R.layout.waiting_dialog, null)
-        dialog.setContentView(view)
-        dialog.setCancelable(false)
+        waitingDialog?.setContentView(view)
+        waitingDialog?.setCancelable(false)
 
         val roomIdText = view.findViewById<TextView>(R.id.roomIdText)
         roomIdText.text = "Room ID: $roomId"
@@ -118,12 +116,12 @@ object Dialogs {
         val cancelButton = view.findViewById<Button>(R.id.cancelButton)
         cancelButton.setOnClickListener {
             statusText.clearAnimation()
-            dialog.dismiss()
+            waitingDialog?.dismiss()
             onCancel.run()
         }
 
-        dialog.show()
-        return dialog
+        waitingDialog?.show()
+        return waitingDialog!!
     }
 
 

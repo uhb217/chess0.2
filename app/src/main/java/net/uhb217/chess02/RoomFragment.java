@@ -134,6 +134,7 @@ public class RoomFragment extends Fragment {
               Log.d("RoomActivity", "Player2 data changed: " + snapshot1.getValue());
               if (!triggered && snapshot1.exists()) {
                 triggered = true;
+                Dialogs.INSTANCE.dismissWaitingDialog();
                 startGameActivity(getContext(),roomId, player, snapshot1.getValue(Player.class));
               }
             }));

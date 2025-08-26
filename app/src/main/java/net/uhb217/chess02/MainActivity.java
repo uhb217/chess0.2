@@ -1,7 +1,10 @@
 package net.uhb217.chess02;
 
+import static net.uhb217.chess02.ux.utils.Color.BLACK;
 import static net.uhb217.chess02.ux.utils.Color.WHITE;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 
@@ -16,6 +19,7 @@ import net.uhb217.chess02.ui.BottomGameControls;
 import net.uhb217.chess02.ui.PlayerInfoView;
 import net.uhb217.chess02.ux.Board;
 import net.uhb217.chess02.ux.Player;
+import net.uhb217.chess02.ux.utils.StockfishApi;
 
 public class MainActivity extends NoBackGestureActivity {
   private Board board;
@@ -23,6 +27,7 @@ public class MainActivity extends NoBackGestureActivity {
   PlayerInfoView topPlayerInfoView, bottomPlayerInfoView;
   Player mainPlayer, opponentPlayer;
 
+  @SuppressLint("MissingInflatedId")
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -61,6 +66,9 @@ public class MainActivity extends NoBackGestureActivity {
     rootLayout.addView(bottomPlayerInfoView);
 
     BottomGameControls.INSTANCE.setup(this, !againstStockfish);
+    if (againstStockfish && mainPlayer.getColor() == BLACK)
+        StockfishApi.INSTANCE.playBestMove(board.toFEN(), Integer.parseInt(roomId), findViewById(R.id.lottie));
+
   }
 
   @Override

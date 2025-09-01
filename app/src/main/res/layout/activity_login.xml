@@ -50,7 +50,7 @@
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/darker_gray"
                 android:layout_marginBottom="16dp"
-                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_!#"
                 android:singleLine="true"
                 android:inputType="text" />
 

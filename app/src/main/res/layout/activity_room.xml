@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/sec_background"
+        android:background="@drawable/rounded_bg"
         app:tabIconTint="@color/tab_color_selector"
         app:tabTextColor="@color/tab_color_selector"
         app:tabIndicatorColor="#428E45">

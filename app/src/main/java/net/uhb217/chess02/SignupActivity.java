@@ -72,14 +72,14 @@ public class SignupActivity extends AppCompatActivity {
                     startActivity(new Intent(this, LoginActivity.class));
                     Toast.makeText(this, "Signup successful", Toast.LENGTH_SHORT).show();
                   })
-                  .addOnFailureListener(e -> Log.e("SignupActivity", "Failed to save user data", e));
+                  .addOnFailureListener(e -> Toast.makeText(this, "Signup failed", Toast.LENGTH_SHORT).show());
             })
             .addOnFailureListener(e -> {
               waitingDialog.dismiss();
               if (e instanceof FirebaseAuthUserCollisionException)
                 username.setError("Username already exists");
               else
-                Log.e("SignupActivity", "Signup failed", e);
+                Toast.makeText(this, "Signup failed", Toast.LENGTH_SHORT).show();
             });
       }
     });

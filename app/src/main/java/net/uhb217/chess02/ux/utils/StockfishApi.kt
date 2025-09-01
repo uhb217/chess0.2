@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import com.airbnb.lottie.LottieAnimationView
+import net.uhb217.chess02.ux.Board
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -16,7 +17,6 @@ import org.json.JSONObject
 import java.io.IOException
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
-
 
 object StockfishApi {
 
@@ -32,11 +32,16 @@ object StockfishApi {
         Handler(Looper.getMainLooper()).post {
             waitAnimation.playAnimation()
         }
+        //flip the fen around the y axis
+        var fixedFen: String = fen
+        if (Board.getInstance().color == Color.BLACK)
+           fixedFen = flipFenAroundY(fen)
+
         // Create the request
         val realDepth = if (MoveHistory.length <= 5) MoveHistory.length * 2 else depth
         val jsonBody = """
             {
-              "fen": "$fen",
+              "fen": "$fixedFen",
               "depth": $realDepth
             }
         """.trimIndent()
@@ -70,7 +75,7 @@ object StockfishApi {
                     if (!json.has("bestmove")) {
                         Log.e(
                             "Stockfish", "Missing required fields in response: $json \n" +
-                                    "fen: $fen"
+                                    "fen: $fixedFen"
                         )
                         return
                     }
@@ -82,5 +87,49 @@ object StockfishApi {
                 }
             }
         })
+    }
+    fun flipFenAroundY(fen: String): String {
+        // Split FEN into board position and other components
+        val parts = fen.split(" ")
+        val position = parts[0]
+
+        // Split position into ranks
+        val ranks = position.split("/")
+
+        // Flip each rank
+        val flippedRanks = ranks.map { rank ->
+            val expandedRank = StringBuilder()
+            // Expand numbers to empty squares
+            for (c in rank) {
+                if (c.isDigit()) {
+                    repeat(c.digitToInt()) { expandedRank.append('.') }
+                } else {
+                    expandedRank.append(c)
+                }
+            }
+            // Reverse the rank
+            val reversedRank = expandedRank.reverse()
+            // Compress empty squares back to numbers
+            var count = 0
+            val compressedRank = StringBuilder()
+            for (c in reversedRank) {
+                if (c == '.') {
+                    count++
+                } else {
+                    if (count > 0) {
+                        compressedRank.append(count)
+                        count = 0
+                    }
+                    compressedRank.append(c)
+                }
+            }
+            if (count > 0) {
+                compressedRank.append(count)
+            }
+            compressedRank.toString()
+        }
+
+        // Reconstruct the FEN string
+        return flippedRanks.joinToString("/") + " " + parts.drop(1).joinToString(" ")
     }
 }

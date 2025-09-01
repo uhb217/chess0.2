@@ -1,9 +1,9 @@
 package net.uhb217.chess02.ui
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -16,6 +16,7 @@ import androidx.core.graphics.drawable.toDrawable
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import net.uhb217.chess02.R
+import net.uhb217.chess02.RoomActivity
 import net.uhb217.chess02.RoomFragment
 import net.uhb217.chess02.ux.Player
 import net.uhb217.chess02.ux.utils.Color
@@ -92,7 +93,7 @@ object Dialogs {
 
         btnExit.setOnClickListener {
             dialog.dismiss()
-            ctx.finish()
+            ctx.startActivity(Intent(ctx, RoomActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
         }
 
         dialog.show()
@@ -176,7 +177,7 @@ object Dialogs {
     fun dismissWaitForDrawResponseDialog() {
         waitForDrawResponse?.dismiss()
     }
-    private var stockfishElo: Int = 15
+    private var stockfishDepth: Int = 15
     fun stockfishDialog(ctx: Context){
         val dialog = TransparentDialog(ctx)
         dialog.setContentView(R.layout.dialog_stockfish_conf)
@@ -186,20 +187,9 @@ object Dialogs {
 
             Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser(), { player ->
                 player.color = if (isWhite) Color.WHITE else Color.BLACK
-                RoomFragment.startGameActivity(ctx, getStockfishElo().toString(), player
-                    ,Player.Stockfish(getStockfishElo(), player.color.opposite()))
+                RoomFragment.startGameActivity(ctx, getStockfishDepth().toString(), player
+                    ,Player.Stockfish(getStockfishDepth(), player.color.opposite()))
             })
-//            Player.fromFirebaseUser(
-//                FirebaseAuth.getInstance().getCurrentUser(),
-//                PlayerCallback { player: Player? ->
-//                    startGameActivity(
-//                        getStockfishElo().toString(), player!!.setColor(Color.WHITE),
-//                        Player.Stockfish(getStockfishElo())
-//                    )
-//                })
-//            Player.fromFirebaseUser(FirebaseAuth.getInstance().getCurrentUser()
-//            , player -> startGameActivity(String.valueOf(Dialogs.INSTANCE.getStockfishElo()), player.setColor(Color.WHITE)
-//                , Player.Stockfish(Dialogs.INSTANCE.getStockfishElo())))
             dialog.dismiss()
         }
 
@@ -209,7 +199,7 @@ object Dialogs {
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(bar: SeekBar?, value: Int, p2: Boolean) {
                 eloView.text = value.toString()
-                stockfishElo = value
+                stockfishDepth = value
             }
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {}
@@ -217,8 +207,8 @@ object Dialogs {
 
         dialog.show()
     }
-    fun getStockfishElo(): Int{
-        return stockfishElo
+    fun getStockfishDepth(): Int{
+        return stockfishDepth
     }
     interface PromotionCallback {
         fun onPieceChosen(piece: Char)

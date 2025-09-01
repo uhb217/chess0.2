@@ -164,6 +164,7 @@ public class RoomFragment extends Fragment {
     intent.putExtra("mainPlayer", mainPlayer);
     intent.putExtra("opponentPlayer", opponentPlayer);
     intent.putExtra("roomId", roomId);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
     ctx.startActivity(intent);
   }
 
